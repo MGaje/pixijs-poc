@@ -1,19 +1,26 @@
 import * as PIXI from 'pixi.js';
 
-export class Scene extends PIXI.Container {
+
+export abstract class Scene extends PIXI.Container {
     private _paused: boolean = false;
-    private _update = (delta: number) => {};
+    protected resources: PIXI.IResourceDictionary;
 
-    constructor() {
+    constructor(r: PIXI.IResourceDictionary) {
         super();
-    }
 
-    public onUpdate(cb: (delta: number) => void) {
-        this._update = cb;
+        this.resources = r;
     }
 
     public update(delta: number) {
-        this._update(delta);
+        if (!this.isPaused()) {
+            this.onUpdate(delta);
+        }
+    }
+
+    protected abstract onUpdate(delta: number);
+
+    protected getResource(file: string): PIXI.LoaderResource {
+        return this.resources[`assets/${file}`];
     }
 
     public pause() {

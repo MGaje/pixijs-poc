@@ -1,20 +1,27 @@
 import * as PIXI from 'pixi.js';
 import { Scene } from './scene';
 
-export class SceneManager {
+export interface ISceneManager {
+    addScene(name: string, s: Scene): void;
+    hasScene(name: string): boolean;
+    goToScene(name: string): boolean;
+}
+
+export class SceneManager implements ISceneManager {
     private _scenes: Map<string, Scene> = new Map<string, Scene>();
     public currentScene: Scene;
 
-    public createScene(name: string): Scene {
+    public addScene(name: string, s: Scene): void {
         if (this._scenes[name]) {
             // This function is specifically for creating a scene.
             return null;
         }
 
-        const scene: Scene = new Scene();
-        this._scenes[name] = scene;
+        this._scenes[name] = s;
+    }
 
-        return scene;
+    public hasScene(name: string): boolean {
+        return this._scenes.has(name);
     }
 
     public goToScene(name: string): boolean {
