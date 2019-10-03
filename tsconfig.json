@@ -17,7 +17,10 @@
     "lib": [
       "es2018",
       "dom"
-    ]
+    ],
+    "paths": {
+        "@tweenjs/tween.js": ["node_modules/@tweenjs/tween.js/dist/tween.cjs.js"]
+    }
   },
   "angularCompilerOptions": {
     "fullTemplateTypeCheck": true,

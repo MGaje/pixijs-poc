@@ -1,5 +1,7 @@
 import * as PIXI from 'pixi.js';
 import 'pixi-sound';
+import * as TWEEN from '@tweenjs/tween.js';
+
 import { Scene } from '../../scene';
 
 enum SceneResources {
@@ -32,5 +34,10 @@ export class TestGamePlayScene extends Scene {
 
     private _onBlobClick() {
         this.getResource(SceneResources.SuccessSound).sound.play();
+        this.cat.alpha
+        new TWEEN.Tween(this.cat)
+            .to({ alpha: 0, x: 256, y: 256 }, 2500)
+            .easing(TWEEN.Easing.Quadratic.Out)
+            .start();
     }
 }
