@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js';
-
+import * as TWEEN from '@tweenjs/tween.js';
 
 export abstract class Scene extends PIXI.Container {
     private _paused: boolean = false;
@@ -14,6 +14,7 @@ export abstract class Scene extends PIXI.Container {
     public update(delta: number) {
         if (!this.isPaused()) {
             this.onUpdate(delta);
+            TWEEN.update();
         }
     }
 

@@ -1,6 +1,5 @@
 import * as PIXI from 'pixi.js';
 import { ElementRef } from '@angular/core';
-import * as TWEEN from '@tweenjs/tween.js';
 
 import { SceneManager, ISceneManager } from './scene-manager';
 
@@ -90,7 +89,6 @@ export abstract class FPGame implements IGame {
     private _update(delta: number) {
         if (this.sceneManager.currentScene) {
             this.sceneManager.currentScene.update(delta);
-            TWEEN.update();
         }
         else {
             if (this._debugMode) {
