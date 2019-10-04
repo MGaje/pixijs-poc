@@ -1,3 +1,4 @@
+import { ElementRef } from '@angular/core';
 import * as PIXI from 'pixi.js';
 import 'pixi-sound';
 import * as TWEEN from '@tweenjs/tween.js';
@@ -14,8 +15,8 @@ export class TestGamePlayScene extends Scene {
     public cat: PIXI.Sprite;
     public sound: PIXI.sound.Sound;
 
-    constructor(r: PIXI.IResourceDictionary) {
-        super(r);
+    constructor(r: PIXI.IResourceDictionary, stageElement: ElementRef) {
+        super(r, stageElement);
 
         this._setup();
     }

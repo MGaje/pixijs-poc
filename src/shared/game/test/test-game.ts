@@ -21,7 +21,7 @@ export class TestGame extends FPGame {
         // Setup play scene.
         this.sceneManager.addScene(
             Scenes.Play,
-            new TestGamePlayScene(this.resources)
+            new TestGamePlayScene(this.resources, this.getStageElement())
         );
 
         // Set play scene as the current scene.

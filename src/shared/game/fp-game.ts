@@ -5,12 +5,15 @@ import { SceneManager, ISceneManager } from './scene-manager';
 
 export interface IGame {
     init(stageElement: ElementRef, width: number, height: number): void;
+    start(): void;
     destroy(): void;
 }
 
 export abstract class FPGame implements IGame {
     public app: PIXI.Application;
     public sceneManager: SceneManager = new SceneManager();
+
+    private _stageElement: ElementRef;
     private _debugMode: boolean = false;
     private _assets: string[];
 
@@ -28,7 +31,8 @@ export abstract class FPGame implements IGame {
             antialias: true
         });
 
-        stageElement.nativeElement.appendChild(this.app.view);
+        this._stageElement = stageElement;
+        this._stageElement.nativeElement.appendChild(this.app.view);
 
         this.load();
     }
@@ -62,6 +66,7 @@ export abstract class FPGame implements IGame {
         }
 
         this.app.destroy(true);
+        this.sceneManager.clearAll();
     }
 
     protected abstract setupScenes(): void;
@@ -84,6 +89,10 @@ export abstract class FPGame implements IGame {
 
     protected get resources(): PIXI.IResourceDictionary {
         return this.app.loader.resources;
+    }
+
+    protected getStageElement(): ElementRef {
+        return this._stageElement;
     }
 
     private _update(delta: number) {

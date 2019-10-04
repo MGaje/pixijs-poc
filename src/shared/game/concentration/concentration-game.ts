@@ -10,7 +10,8 @@ export class ConcentrationGame extends FPGame {
 
     protected load() {
         this.setAssets([
-            'assets/cat.png',
+            'assets/card-back.png',
+            'assets/ace_of_spades.png',
             'assets/whistle.mp3'
         ]);
 
@@ -21,7 +22,7 @@ export class ConcentrationGame extends FPGame {
         // Setup play scene.
         this.sceneManager.addScene(
             Scenes.Play,
-            new ConcentrationGamePlayScene(this.resources)
+            new ConcentrationGamePlayScene(this.resources, this.getStageElement())
         );
 
         // Set play scene as the current scene.
