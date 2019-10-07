@@ -3,7 +3,7 @@ import { ElementRef } from '@angular/core';
 import 'pixi-sound';
 import * as TWEEN from '@tweenjs/tween.js';
 import { Scene } from '../../scene';
-
+import { Keyboard, Keys } from '../../keyboard';
 
 enum SceneResources {
     CardBackImage = 'card-back.png',
@@ -25,9 +25,15 @@ export class ConcentrationGamePlayScene extends Scene {
         this._setup();
         this.initInput({
             onKeyDown: (e: KeyboardEvent) => {
-                if (e.code === "KeyF") {
-                    console.log('key pressed!');
-                    this.getResource(SceneResources.WhistleSound).sound.play();
+                if (Keyboard.isKeyActive(e, Keys.KeyF)) {
+                    if (this.isPaused()) {
+                        this.resume();
+                        console.log('resume!');
+                    }
+                    else {
+                        this.pause();
+                        console.log('pause!');
+                    }
                 }
             }
         });
@@ -80,13 +86,13 @@ export class ConcentrationGamePlayScene extends Scene {
 
         let scale = { x: this.card.scale.x };
 
-        new TWEEN.Tween(scale)
+        this.createTween(scale)
             .to({ x: 0 }, 250)
             .easing(TWEEN.Easing.Linear.None)
             .onUpdate(result => {
                 this.card.scale.x = result.x;
             })
-            .chain(new TWEEN.Tween({ x: 0 })
+            .chain(this.createTween({ x: 0 })
                 .onStart(() => {
                     if (this.cardFaceUp) {
                         this.card.texture = this.getResource(SceneResources.CardBackImage).texture;

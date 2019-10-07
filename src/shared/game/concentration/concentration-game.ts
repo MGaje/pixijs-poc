@@ -1,6 +1,7 @@
 import { FPGame } from '../fp-game';
 import { Scene } from '../scene';
 import { ConcentrationGamePlayScene } from './scenes/concentration-game-play-scene';
+import { Keyboard } from '../keyboard';
 
 enum Scenes {
     Play = 'play'
@@ -15,7 +16,7 @@ export class ConcentrationGame extends FPGame {
             'assets/whistle.mp3'
         ]);
 
-        // Any additional load logic.
+        Keyboard.init();
     }
 
     protected setupScenes(): void {

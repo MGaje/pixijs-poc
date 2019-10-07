@@ -1,5 +1,6 @@
 import { ElementRef } from '@angular/core';
 import * as PIXI from 'pixi.js';
+import Sound from 'pixi-sound';
 import * as TWEEN from '@tweenjs/tween.js';
 
 type DOMGameEventHandler = (...params: any[]) => void;
@@ -8,6 +9,8 @@ export abstract class Scene extends PIXI.Container {
     private _paused: boolean = false;
     private _stageElement: ElementRef;
     private _eventHandlers: Map<string, DOMGameEventHandler>;
+    private _tweenGroup: TWEEN.Group;
+    private _tweens: TWEEN.Tween[];
     protected resources: PIXI.IResourceDictionary;
 
     constructor(r: PIXI.IResourceDictionary, stageElement: ElementRef) {
@@ -15,7 +18,6 @@ export abstract class Scene extends PIXI.Container {
 
         this.resources = r;
         this._stageElement = stageElement;
-        this._eventHandlers = new Map<string, DOMGameEventHandler>();
 
         this._baseSetup();
     }
@@ -23,7 +25,7 @@ export abstract class Scene extends PIXI.Container {
     public update(delta: number) {
         if (!this.isPaused()) {
             this.onUpdate(delta);
-            TWEEN.update();
+            this._tweenGroup.update();
         }
 
     }
@@ -35,6 +37,8 @@ export abstract class Scene extends PIXI.Container {
         });
 
         this._eventHandlers.clear();
+        this._tweenGroup.removeAll();
+        this._tweens = [];
         this._stageElement = undefined;
     }
 
@@ -51,6 +55,14 @@ export abstract class Scene extends PIXI.Container {
 
     public pause() {
         this._paused = true;
+
+        this._tweens.forEach(x => {
+            x.pause();
+        });
+
+        Sound.pauseAll();
+        this.interactiveChildren = false;
+
         this.onPause();
     }
 
@@ -63,6 +75,15 @@ export abstract class Scene extends PIXI.Container {
 
     public resume() {
         this._paused = false;
+
+        this._tweens.forEach(x => {
+            x.resume();
+        });
+
+
+        Sound.resumeAll();
+        this.interactiveChildren = true;
+
         this.onResume();
     }
 
@@ -92,6 +113,17 @@ export abstract class Scene extends PIXI.Container {
         // Register the events on the DOM element.
     }
 
+    protected createTween(obj?: any): TWEEN.Tween {
+        const t = new TWEEN.Tween(obj, this._tweenGroup)
+            .onComplete(() => {
+                this._tweens = this._tweens.filter(x => x.getId() !== t.getId());
+            });
+
+        this._tweens.push(t);
+
+        return t;
+    }
+
     private _baseSetup() {
         if (!this._stageElement) {
             console.error('Stage element must be defined before scene can be setup');
@@ -100,5 +132,12 @@ export abstract class Scene extends PIXI.Container {
 
         // Enable z-indexing.
         this.sortableChildren = true;
+
+        // Create container for event handlers.
+        this._eventHandlers = new Map<string, DOMGameEventHandler>();
+
+        // Create tween group for the scene.
+        this._tweenGroup = new TWEEN.Group();
+        this._tweens = [];
     }
 }
