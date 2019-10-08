@@ -1,13 +1,25 @@
 import { FPGame } from '../fp-game';
 import { Scene } from '../scene';
-import { ConcentrationGamePlayScene } from './scenes/concentration-game-play-scene';
+import { ConcentrationGamePlayScene } from './scenes/play-scene/concentration-game-play-scene';
 import { Keyboard } from '../keyboard';
+import { ConcentrationGameTestScene } from './scenes/test-scene/concentration-game-test-scene';
 
 enum Scenes {
-    Play = 'play'
+    Play = 'play',
+    Test = 'test'
 };
 
 export class ConcentrationGame extends FPGame {
+
+    private static _instance: ConcentrationGame;
+
+    public static getInstance(): ConcentrationGame {
+        if (!ConcentrationGame._instance) {
+            ConcentrationGame._instance = new ConcentrationGame();
+        }
+
+        return ConcentrationGame._instance;
+    }
 
     protected load() {
         this.setAssets([
@@ -26,6 +38,12 @@ export class ConcentrationGame extends FPGame {
             new ConcentrationGamePlayScene(this.resources, this.getStageElement())
         );
 
+        // Setup test scene.
+        this.sceneManager.addScene(
+            Scenes.Test,
+            new ConcentrationGameTestScene(this.resources, this.getStageElement())
+        );
+
         // Set play scene as the current scene.
         if (this.goToScene(Scenes.Play)) {
             console.log('play scene!');
@@ -33,5 +51,13 @@ export class ConcentrationGame extends FPGame {
         else {
             console.log('could not set play scene');
         }
+    }
+
+    public goToPlayScene(): boolean {
+        return this.goToScene(Scenes.Play);
+    }
+
+    public goToTestScene(): boolean {
+        return this.goToScene(Scenes.Test);
     }
 }

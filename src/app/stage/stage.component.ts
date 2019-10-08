@@ -19,7 +19,7 @@ export class StageComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     public ngAfterViewInit() {
-        this.game = new ConcentrationGame();
+        this.game = ConcentrationGame.getInstance();
         this.game.init(this.gameStage, 1000, 1000);
         this.game.start();
     }
