@@ -4,6 +4,7 @@ import * as PIXI from 'pixi.js';
 import { InputController } from '../../../input-controller';
 import { Keyboard, Keys } from '../../../keyboard';
 import { ConcentrationGame } from '../../concentration-game';
+import { GameController } from 'src/shared/game/game-controller';
 
 export class ConcentrationGameTestScene extends Scene {
     public testText: PIXI.Text;
@@ -47,7 +48,7 @@ export class ConcentrationGameTestScene extends Scene {
             }
         }
         else if (Keyboard.isKeyActive(e, Keys.KeyX)) {
-            ConcentrationGame.getInstance().goToPlayScene();
+            GameController.getGameInstance<ConcentrationGame>().goToPlayScene();
         }
     }
 }

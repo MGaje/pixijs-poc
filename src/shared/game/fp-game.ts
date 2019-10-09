@@ -10,6 +10,8 @@ import * as PIXI from 'pixi.js';
 import { ElementRef } from '@angular/core';
 
 import { SceneManager, ISceneManager } from './scene-manager';
+import { Scene } from './scene';
+import { GameController } from './game-controller';
 
 /**
  * Interface for what our games must implement.
@@ -30,6 +32,10 @@ export abstract class FPGame implements IGame {
     private _stageElement: ElementRef;
     private _debugMode: boolean = false;
     private _assets: string[];
+    private _fpsDisplay: PIXI.Text;
+    private _fpsLastUpdate: number = 0;
+
+    private readonly _targetRatio: number;
 
     /**
      * Constructor.
@@ -38,6 +44,7 @@ export abstract class FPGame implements IGame {
      */
     constructor(debugMode?: boolean) {
         this._debugMode = !!debugMode;
+        this._targetRatio = 16/9;
     }
 
     /**
@@ -52,13 +59,29 @@ export abstract class FPGame implements IGame {
             return;
         }
 
+        let w: number = 0, h: number = 0;
+
+        if (window.innerWidth / window.innerHeight >= this._targetRatio) {
+            w = window.innerHeight * this._targetRatio;
+            h = window.innerHeight;
+        }
+        else {
+            w = window.innerWidth;
+            h = window.innerHeight / this._targetRatio;
+        }
+
         this.app = new PIXI.Application({
-            width: width, height: height,
-            antialias: true
+            width: w, height: h,
+            antialias: true,
+            resolution: window.devicePixelRatio
         });
 
         this._stageElement = stageElement;
         this._stageElement.nativeElement.appendChild(this.app.view);
+
+        this._fpsDisplay = new PIXI.Text("", { fontSize: 14, fill: '#00ff00' });
+
+        GameController.setGameInstance(this);
 
         this.load();
     }
@@ -84,7 +107,7 @@ export abstract class FPGame implements IGame {
             })
             .load(() => {
                 this.setupScenes();
-                this.app.ticker.add(delta => this._update(delta));
+                this.app.ticker.add(delta => this._update(delta, this.app.ticker.FPS, this.app.ticker.elapsedMS));
             });
     }
 
@@ -126,10 +149,9 @@ export abstract class FPGame implements IGame {
      * Go/resume the specified scene.
      * @param name The name of the scene to go to.
      */
-    protected goToScene(name: string): boolean {
+    public goToScene(name: string): boolean {
         if (this.sceneManager.goToScene(name)) {
-            this.app.stage.removeChildren(); // todo: this may need to be smarter if we want to have multiple scenes at once.
-            this.app.stage.addChild(this.sceneManager.currentScene);
+            this._resetStage(this.sceneManager.currentScene);
 
             return true;
         }
@@ -155,7 +177,15 @@ export abstract class FPGame implements IGame {
      * Game update loop.
      * @param delta The time delta between frames.
      */
-    private _update(delta: number) {
+    private _update(delta: number, fps: number, frameTime: number) {
+        if (this._debugMode) {
+            this._fpsLastUpdate += frameTime;
+            if (this._fpsLastUpdate > 1000) {
+                this._fpsDisplay.text = `${Math.round(fps)}`;
+                this._fpsLastUpdate = 0;
+            }
+        }
+
         if (this.sceneManager.currentScene) {
             this.sceneManager.currentScene.update(delta);
         }
@@ -163,6 +193,18 @@ export abstract class FPGame implements IGame {
             if (this._debugMode) {
                 console.warn("Game - no current scene");
             }
+        }
+    }
+
+    private _resetStage(s: Scene) {
+        this.app.stage.removeChildren();
+        this.app.stage.addChild(this._fpsDisplay); // Better way to do this?
+        this.app.stage.addChild(s);
+    }
+
+    private _redraw() {
+        if (!this.app || !this.app.renderer) {
+            return;
         }
     }
 }

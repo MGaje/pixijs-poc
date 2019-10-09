@@ -6,6 +6,7 @@ import { Scene } from '../../../scene';
 import { Keyboard, Keys } from '../../../keyboard';
 import { InputController } from 'src/shared/game/input-controller';
 import { ConcentrationGame } from '../../concentration-game';
+import { GameController } from 'src/shared/game/game-controller';
 
 enum SceneResources {
     CardBackImage = 'card-back.png',
@@ -58,7 +59,7 @@ export class ConcentrationGamePlayScene extends Scene {
         this.card2 = new PIXI.Sprite(this.getResource(SceneResources.CardFrontImage).texture);
         this.addChild(this.card2);
 
-        this.pauseText = new PIXI.Text('Paused', {fontFamily : 'Arial', fontSize: 24, fill : 0xff1010, align : 'center'});
+        this.pauseText = new PIXI.Text('Paused', {fontFamily : 'Arial', fontSize: 48, fill : 0xff1010, align : 'center'});
         this.addChild(this.pauseText);
     }
 
@@ -66,22 +67,22 @@ export class ConcentrationGamePlayScene extends Scene {
         this.card.texture = this.getResource(SceneResources.CardBackImage).texture;
         this.cardFaceUp = false;
 
-        this.card.scale.x = 0.5;
-        this.card.scale.y = 0.5;
+        this.card.scale.x = 1;
+        this.card.scale.y = 1;
         this.card.anchor.x = 0.5;
         this.card.anchor.y = 0.5;
-        this.card.position.x = 150;
-        this.card.position.y = 250;
+        this.card.position.x = 450;
+        this.card.position.y = 550;
         this.card.interactive = true;
         this.card.buttonMode = true;
         this.card.zIndex = 2;
 
-        this.card2.scale.x = 0.5;
-        this.card2.scale.y = 0.5;
+        this.card2.scale.x = 1;
+        this.card2.scale.y = 1;
         this.card2.anchor.x = 0.5;
         this.card2.anchor.y = 0.5;
-        this.card2.position.x = 250;
-        this.card2.position.y = 350;
+        this.card2.position.x = 850;
+        this.card2.position.y = 550;
         this.card2.zIndex = 1;
 
         this.pauseText.visible = false;
@@ -90,16 +91,16 @@ export class ConcentrationGamePlayScene extends Scene {
     private _onCardClick() {
         this.getResource(SceneResources.WhistleSound).sound.play();
 
-        let scale = { x: this.card.scale.x };
+        let scale = { y: this.card.scale.y };
 
         this.createTween(scale)
             .onStart(() => this.card.interactive = false)
-            .to({ x: 0 }, 75)
-            .easing(TWEEN.Easing.Linear.None)
+            .to({ y: 0 }, 100)
+            .easing(TWEEN.Easing.Quadratic.Out)
             .onUpdate(result => {
-                this.card.scale.x = result.x;
+                this.card.scale.y = result.y;
             })
-            .chain(this.createTween({ x: 0 })
+            .chain(this.createTween({ y: 0 })
                 .onStart(() => {
                     if (this.cardFaceUp) {
                         this.card.texture = this.getResource(SceneResources.CardBackImage).texture;
@@ -110,10 +111,10 @@ export class ConcentrationGamePlayScene extends Scene {
                         this.cardFaceUp = true;
                     }
                 })
-                .to({x: 0.5}, 75)
-                .easing(TWEEN.Easing.Linear.None)
+                .to({y: 1}, 100)
+                .easing(TWEEN.Easing.Quadratic.Out)
                 .onUpdate(result => {
-                    this.card.scale.x = result.x;
+                    this.card.scale.y = result.y;
                 })
                 .onComplete(() => this.card.interactive = true)
             )
@@ -138,7 +139,7 @@ export class ConcentrationGamePlayScene extends Scene {
             }
         }
         else if (Keyboard.isKeyActive(e, Keys.KeyX)) {
-            ConcentrationGame.getInstance().goToTestScene();
+            GameController.getGameInstance<ConcentrationGame>().goToTestScene();
         }
     }
 }

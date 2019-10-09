@@ -1,4 +1,5 @@
 import { FPGame } from '../fp-game';
+import { GameController } from '../game-controller';
 import { Scene } from '../scene';
 import { ConcentrationGamePlayScene } from './scenes/play-scene/concentration-game-play-scene';
 import { Keyboard } from '../keyboard';
@@ -10,16 +11,6 @@ enum Scenes {
 };
 
 export class ConcentrationGame extends FPGame {
-
-    private static _instance: ConcentrationGame;
-
-    public static getInstance(): ConcentrationGame {
-        if (!ConcentrationGame._instance) {
-            ConcentrationGame._instance = new ConcentrationGame();
-        }
-
-        return ConcentrationGame._instance;
-    }
 
     protected load() {
         this.setAssets([
