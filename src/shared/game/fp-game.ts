@@ -117,7 +117,7 @@ export abstract class FPGame implements IGame {
             .load(() => {
                 this._destroyProgressbar();
                 this.setupScenes();
-                this.app.ticker.add(delta => this._update(delta, this.app.ticker.FPS, this.app.ticker.elapsedMS));
+                this.app.ticker.add(delta => this._update(delta, this.app.ticker));
             });
     }
 
@@ -188,11 +188,14 @@ export abstract class FPGame implements IGame {
      * Game update loop.
      * @param delta The time delta between frames.
      */
-    private _update(delta: number, fps: number, frameTime: number) {
+    private _update(delta: number, ticker: PIXI.Ticker) {
+        // console.log("Last Time: " + ticker.lastTime);
+        // console.log("Last deltaMS: " + ticker.deltaMS);
+        // console.log("Last deltaTime: " + ticker.deltaTime);
         if (this._debugMode) {
-            this._fpsLastUpdate += frameTime;
+            this._fpsLastUpdate += ticker.elapsedMS;
             if (this._fpsLastUpdate > 1000) {
-                this._fpsDisplay.text = `${Math.round(fps)}`;
+                this._fpsDisplay.text = `${Math.round(ticker.FPS)}`;
                 this._fpsLastUpdate = 0;
             }
         }

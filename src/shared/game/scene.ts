@@ -217,6 +217,7 @@ export abstract class Scene extends PIXI.Container {
         const t = new TWEEN.Tween(obj, this._tweenGroup)
             .onComplete(() => {
                 this._tweens = this._tweens.filter(x => x.getId() !== t.getId());
+                this._tweenGroup.remove(t);
             });
 
         this._tweens.push(t);
