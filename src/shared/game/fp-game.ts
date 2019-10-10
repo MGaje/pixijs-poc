@@ -57,26 +57,29 @@ export abstract class FPGame implements IGame {
      * @param width The width of the stage.
      * @param height The heigh of the stage.
      */
-    public init(stageElement: ElementRef, width: number, height: number) {
+    public init(stageElement: ElementRef, width: number, height: number, yOffset?: number) {
         if (this.app) {
             return;
         }
 
-        let w: number = 0, h: number = 0;
+        if (!yOffset) {
+            yOffset = 0;
+        }
 
-        if (window.innerWidth / window.innerHeight >= this._targetRatio) {
-            w = window.innerHeight * this._targetRatio;
-            h = window.innerHeight;
-        }
-        else {
-            w = window.innerWidth;
-            h = window.innerHeight / this._targetRatio;
-        }
+        let w: number = window.innerWidth, h: number = window.innerHeight - yOffset;
+
+        // if (window.innerWidth / window.innerHeight >= this._targetRatio) {
+        //     w = window.innerHeight * this._targetRatio;
+        //     h = window.innerHeight;
+        // }
+        // else {
+        //     w = window.innerWidth;
+        //     h = window.innerHeight / this._targetRatio;
+        // }
 
         this.app = new PIXI.Application({
             width: w, height: h,
-            antialias: true,
-            resolution: window.devicePixelRatio
+            antialias: true
         });
 
         this._stageElement = stageElement;

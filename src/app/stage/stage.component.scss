@@ -13,3 +13,15 @@
 //     transform: translate(-50%, -50%);
 //     -webkit-transform: translate(-50%, -50%);
 // }
+
+.header {
+    display: flex;
+}
+
+#gameStage {
+    canvas {
+        display: block;
+        width: 100%;
+        height: 100%;
+    }
+}
