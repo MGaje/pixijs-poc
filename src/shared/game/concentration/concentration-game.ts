@@ -16,7 +16,23 @@ export class ConcentrationGame extends FPGame {
         this.setAssets([
             'assets/card-back.png',
             'assets/ace_of_spades.png',
-            'assets/whistle.mp3'
+            'assets/whistle.mp3',
+            'assets/loops/loop1.mp3',
+            'assets/loops/loop2.mp3',
+            'assets/loops/loop3.mp3',
+            'assets/loops/loop4.mp3',
+            'assets/applause.mp3',
+            'assets/applause.ogg',
+            'assets/bird.mp3',
+            'assets/boing.mp3',
+            'assets/buzzer.mp3',
+            'assets/car.mp3',
+            'assets/chime.mp3',
+            'assets/mechanical.mp3',
+            'assets/musical.mp3',
+            'assets/sprite.mp3',
+            'assets/success.mp3',
+            'assets/sword.mp3'
         ]);
 
         Keyboard.init();

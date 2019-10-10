@@ -32,8 +32,11 @@ export abstract class FPGame implements IGame {
     private _stageElement: ElementRef;
     private _debugMode: boolean = false;
     private _assets: string[];
+
     private _fpsDisplay: PIXI.Text;
     private _fpsLastUpdate: number = 0;
+
+    private _progress: PIXI.Graphics;
 
     private readonly _targetRatio: number;
 
@@ -100,12 +103,16 @@ export abstract class FPGame implements IGame {
             return;
         }
 
+        this._setupProgressbar();
+
         this.app.loader
             .add(this._assets)
             .on("progress", (loader: PIXI.Loader, resources: PIXI.LoaderResource) => {
                 console.log("progress: " + loader.progress + "%");
+                this._updateProgressbar(loader.progress / 100);
             })
             .load(() => {
+                this._destroyProgressbar();
                 this.setupScenes();
                 this.app.ticker.add(delta => this._update(delta, this.app.ticker.FPS, this.app.ticker.elapsedMS));
             });
@@ -123,6 +130,7 @@ export abstract class FPGame implements IGame {
 
         this.app.destroy(true);
         this.sceneManager.clearAll();
+        GameController.setGameInstance(null);
     }
 
     /**
@@ -206,5 +214,42 @@ export abstract class FPGame implements IGame {
         if (!this.app || !this.app.renderer) {
             return;
         }
+    }
+
+    private _setupProgressbar() {
+        this._progress = new PIXI.Graphics();
+        this._progress.beginFill(0xE1B022);
+        this._progress.drawRect(0, 0, 250, 25);
+        this._progress.beginHole();
+        this._progress.drawRect(1, 1, 248, 23)
+        this._progress.endHole();
+        this._progress.endFill();
+
+        this._progress.position.x = (this.app.view.width / 2) - (this._progress.width / 2);
+        this._progress.position.y = (this.app.view.height / 2) - (this._progress.height / 2);
+
+        this.app.stage.addChild(this._progress);
+    }
+
+    private _updateProgressbar(percentage: number) {
+        const holeX: number = 250 * percentage;
+        const holeWidth: number = (250 - holeX) - 1;
+
+        this._progress.clear();
+        this._progress.beginFill(0xE1B022);
+        this._progress.drawRect(0, 0, 250, 25);
+        this._progress.beginHole();
+        this._progress.drawRect(holeX, 1, holeWidth, 23)
+        this._progress.endHole();
+        this._progress.endFill();
+
+        this._progress.position.x = (this.app.view.width / 2) - (this._progress.width / 2);
+        this._progress.position.y = (this.app.view.height / 2) - (this._progress.height / 2);
+    }
+
+    private _destroyProgressbar() {
+        this._progress.clear();
+        this._progress.destroy();
+        this._progress = null;
     }
 }
