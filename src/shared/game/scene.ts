@@ -80,10 +80,10 @@ export abstract class Scene extends PIXI.Container {
 
     /**
      * Helper method to get a specific resource from the loaded resources.
-     * @param file 
+     * @param file
      */
     protected getResource(file: string): PIXI.LoaderResource {
-        return this.resources[`assets/${file}`];
+        return this.resources[file.indexOf('assets') === -1 ? `assets/${file}` : file];
     }
 
     /**

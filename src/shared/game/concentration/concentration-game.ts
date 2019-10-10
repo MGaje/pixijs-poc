@@ -12,10 +12,27 @@ enum Scenes {
 
 export class ConcentrationGame extends FPGame {
 
+    private static cardValues = [
+        '2', '3', '4', '5', '6', '7', '8', '9', '10', 'jack', 'queen', 'king', 'ace'
+    ];
+
+    private static cardSuits = [
+        'spades', 'clubs', 'hearts', 'diamonds'
+    ];
+
+    public static cardAssets(): string[] {
+        const assets = [];
+        ConcentrationGame.cardValues.forEach(val => {
+            ConcentrationGame.cardSuits.forEach(suit => {
+                assets.push(`assets/cards/${val}_of_${suit}.png`);
+            });
+        });
+        return assets;
+    }
+
     protected load() {
         this.setAssets([
             'assets/card-back.png',
-            'assets/ace_of_spades.png',
             'assets/whistle.mp3',
             'assets/loops/loop1.mp3',
             'assets/loops/loop2.mp3',
@@ -32,7 +49,8 @@ export class ConcentrationGame extends FPGame {
             'assets/musical.mp3',
             'assets/sprite.mp3',
             'assets/success.mp3',
-            'assets/sword.mp3'
+            'assets/sword.mp3',
+            ...ConcentrationGame.cardAssets()
         ]);
 
         Keyboard.init();

@@ -1,25 +1,41 @@
 import * as PIXI from 'pixi.js';
-import { ElementRef } from '@angular/core';
+import {ElementRef} from '@angular/core';
 import 'pixi-sound';
 import * as TWEEN from '@tweenjs/tween.js';
-import { Scene } from '../../../scene';
-import { Keyboard, Keys } from '../../../keyboard';
-import { InputController } from 'src/shared/game/input-controller';
-import { ConcentrationGame } from '../../concentration-game';
-import { GameController } from 'src/shared/game/game-controller';
+import {Scene} from '../../../scene';
+import {Keyboard, Keys} from '../../../keyboard';
+import {InputController} from 'src/shared/game/input-controller';
+import {ConcentrationGame} from '../../concentration-game';
+import {GameController} from 'src/shared/game/game-controller';
+
+const cardWidth = 75;
+const numCols = 16;
 
 enum SceneResources {
     CardBackImage = 'card-back.png',
-    CardFrontImage = 'ace_of_spades.png',
     WhistleSound = 'whistle.mp3'
-};
+}
+
+class Card {
+    public cardFaceUp = false;
+    public resource: PIXI.LoaderResource;
+    public sprite: PIXI.Sprite;
+    public scale: number;
+    public anchor = 0.5;
+
+
+    public constructor(resource: PIXI.LoaderResource) {
+        this.resource = resource;
+        this.sprite = new PIXI.Sprite(this.resource.texture);
+        this.scale = cardWidth / this.sprite.width;
+    }
+}
 
 export class ConcentrationGamePlayScene extends Scene {
     public sound: PIXI.sound.Sound;
-    public card: PIXI.Sprite;
-    public pauseText: PIXI.Text;
+    public cards: Card[] = [];
 
-    public cardFaceUp: boolean = false;
+    public pauseText: PIXI.Text;
 
     constructor(r: PIXI.IResourceDictionary, stageElement: ElementRef) {
         super(r, stageElement);
@@ -41,70 +57,92 @@ export class ConcentrationGamePlayScene extends Scene {
 
     protected onStart() {
         this._reset();
-        console.log("Concentration Game Play Scene Start!");
+        console.log('Concentration Game Play Scene Start!');
     }
 
     protected onStop() {
-        console.log("Concentration Game Play Scene Stop!");
+        console.log('Concentration Game Play Scene Stop!');
+    }
+
+    private shuffle(array: any[]): any[] {
+        return array.sort(() => Math.random() - 0.5);
+    }
+
+    private createCardStack(): void {
+        // double this, so there are two of each card
+        const assets = [...ConcentrationGame.cardAssets(), ...ConcentrationGame.cardAssets()];
+        this.cards = this.shuffle(assets).map(asset => {
+            return new Card(this.getResource(asset));
+        });
     }
 
     private _init() {
-        this.card = new PIXI.Sprite(this.getResource(SceneResources.CardBackImage).texture);
-        this.addChild(this.card);
+        this.createCardStack();
+        // this.card = new PIXI.Sprite(this.getResource(SceneResources.CardBackImage).texture);
+        this.cards.forEach(card => {
+            this.addChild(card.sprite);
+            card.sprite.on('mouseup', () => this._onCardClick(card));
+            card.sprite.on('touchend', () => this._onCardClick(card));
+        });
 
-        this.card.on('mouseup', this._onCardClick.bind(this));
-        this.card.on('touchend', this._onCardClick.bind(this));
 
-        this.pauseText = new PIXI.Text('Paused', {fontFamily : 'Arial', fontSize: 48, fill : 0xff1010, align : 'center'});
+        this.pauseText = new PIXI.Text('Paused', {fontFamily: 'Arial', fontSize: 48, fill: 0xff1010, align: 'center'});
         this.addChild(this.pauseText);
     }
 
     private _reset() {
-        this.card.texture = this.getResource(SceneResources.CardBackImage).texture;
-        this.cardFaceUp = false;
+        let row = 0;
+        let col = 0;
+        this.cards.forEach(card => {
+            card.cardFaceUp = false;
+            card.sprite.texture = this.getResource(SceneResources.CardBackImage).texture;
 
-        this.card.scale.x = 0.25;
-        this.card.scale.y = 0.25;
-        this.card.anchor.x = 0.5;
-        this.card.anchor.y = 0.5;
-        this.card.position.x = 450;
-        this.card.position.y = 550;
-        this.card.interactive = true;
-        this.card.buttonMode = true;
-        this.card.zIndex = 2;
+            card.sprite.scale.x = card.scale;
+            card.sprite.scale.y = card.scale;
+            card.sprite.anchor.x = card.anchor;
+            card.sprite.anchor.y = card.anchor;
+            card.sprite.position.x = (col * (cardWidth + 10)) + (cardWidth / 2);
+            card.sprite.position.y = row * (card.sprite.height + 10) + (card.sprite.height / 2);
+            card.sprite.interactive = true;
+            card.sprite.buttonMode = true;
+            card.sprite.zIndex = 2;
+
+            const atMaxCol = (col + 1) >= numCols;
+            row = atMaxCol ? row + 1 : row;
+            col = atMaxCol ? 0 : col + 1;
+        });
 
         this.pauseText.visible = false;
     }
 
-    private _onCardClick() {
+    private _onCardClick(card: Card) {
         this.getResource(SceneResources.WhistleSound).sound.play();
 
-        let scale = { y: this.card.scale.y };
+        const scale = {y: card.sprite.scale.y};
 
         this.createTween(scale)
-            .onStart(() => this.card.interactive = false)
-            .to({ y: 0 }, 100)
+            .onStart(() => card.sprite.interactive = false)
+            .to({y: 0}, 100)
             .easing(TWEEN.Easing.Quadratic.Out)
             .onUpdate(result => {
-                this.card.scale.y = result.y;
+                card.sprite.scale.y = result.y;
             })
-            .chain(this.createTween({ y: 0 })
+            .chain(this.createTween({y: 0})
                 .onStart(() => {
-                    if (this.cardFaceUp) {
-                        this.card.texture = this.getResource(SceneResources.CardBackImage).texture;
-                        this.cardFaceUp = false;
-                    }
-                    else {
-                        this.card.texture = this.getResource(SceneResources.CardFrontImage).texture;
-                        this.cardFaceUp = true;
+                    if (card.cardFaceUp) {
+                        card.sprite.texture = this.getResource(SceneResources.CardBackImage).texture;
+                        card.cardFaceUp = false;
+                    } else {
+                        card.sprite.texture = card.resource.texture;
+                        card.cardFaceUp = true;
                     }
                 })
-                .to({y: 0.25}, 100)
+                .to({y: card.scale}, 100)
                 .easing(TWEEN.Easing.Quadratic.Out)
                 .onUpdate(result => {
-                    this.card.scale.y = result.y;
+                    card.sprite.scale.y = result.y;
                 })
-                .onComplete(() => this.card.interactive = true)
+                .onComplete(() => card.sprite.interactive = true)
             )
             .start();
     }
@@ -120,13 +158,11 @@ export class ConcentrationGamePlayScene extends Scene {
             if (this.isPaused()) {
                 this.resume();
                 console.log('resume!');
-            }
-            else {
+            } else {
                 this.pause();
                 console.log('pause!');
             }
-        }
-        else if (Keyboard.isKeyActive(e, Keys.KeyX)) {
+        } else if (Keyboard.isKeyActive(e, Keys.KeyX)) {
             GameController.getGameInstance<ConcentrationGame>().goToTestScene();
         }
     }

@@ -22,7 +22,7 @@ export class StageComponent implements OnInit, OnDestroy, AfterViewInit {
 
     public ngAfterViewInit() {
         this.game = new ConcentrationGame(true);
-        this.game.init(this.gameStage, 1000, 1000, this._getHeaderHeight());
+        this.game.init(this.gameStage, this._getHeaderHeight());
         this.game.start();
     }
 
@@ -47,5 +47,5 @@ export class StageComponent implements OnInit, OnDestroy, AfterViewInit {
         //     .reduce((prev, cur) => prev + cur);
 
         return this.header.nativeElement.getBoundingClientRect().height;
-    };
+    }
 }
