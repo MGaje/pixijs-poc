@@ -7,18 +7,20 @@
  */
 
 import * as PIXI from 'pixi.js';
-import { ElementRef } from '@angular/core';
+import {ElementRef} from '@angular/core';
 
-import { SceneManager, ISceneManager } from './scene-manager';
-import { Scene } from './scene';
-import { GameController } from './game-controller';
+import {SceneManager, ISceneManager} from './scene-manager';
+import {Scene} from './scene';
+import {GameController} from './game-controller';
 
 /**
  * Interface for what our games must implement.
  */
 export interface IGame {
     init(stageElement: ElementRef, width: number, height: number): void;
+
     start(): void;
+
     destroy(): void;
 }
 
@@ -47,7 +49,7 @@ export abstract class FPGame implements IGame {
      */
     constructor(debugMode?: boolean) {
         this._debugMode = !!debugMode;
-        this._targetRatio = 16/9;
+        this._targetRatio = 16 / 9;
     }
 
     /**
@@ -57,7 +59,7 @@ export abstract class FPGame implements IGame {
      * @param width The width of the stage.
      * @param height The heigh of the stage.
      */
-    public init(stageElement: ElementRef, width: number, height: number, yOffset?: number) {
+    public init(stageElement: ElementRef, yOffset?: number) {
         if (this.app) {
             return;
         }
@@ -66,7 +68,8 @@ export abstract class FPGame implements IGame {
             yOffset = 0;
         }
 
-        let w: number = window.innerWidth, h: number = window.innerHeight - yOffset;
+        const w = window.innerWidth;
+        const h = window.innerHeight - yOffset;
 
         // if (window.innerWidth / window.innerHeight >= this._targetRatio) {
         //     w = window.innerHeight * this._targetRatio;
@@ -85,7 +88,7 @@ export abstract class FPGame implements IGame {
         this._stageElement = stageElement;
         this._stageElement.nativeElement.appendChild(this.app.view);
 
-        this._fpsDisplay = new PIXI.Text("", { fontSize: 14, fill: '#00ff00' });
+        this._fpsDisplay = new PIXI.Text('', {fontSize: 14, fill: '#00ff00'});
 
         GameController.setGameInstance(this);
 
@@ -110,8 +113,8 @@ export abstract class FPGame implements IGame {
 
         this.app.loader
             .add(this._assets)
-            .on("progress", (loader: PIXI.Loader, resources: PIXI.LoaderResource) => {
-                console.log("progress: " + loader.progress + "%");
+            .on('progress', (loader: PIXI.Loader, resources: PIXI.LoaderResource) => {
+                console.log('progress: ' + loader.progress + '%');
                 this._updateProgressbar(loader.progress / 100);
             })
             .load(() => {
@@ -202,10 +205,9 @@ export abstract class FPGame implements IGame {
 
         if (this.sceneManager.currentScene) {
             this.sceneManager.currentScene.update(delta);
-        }
-        else {
+        } else {
             if (this._debugMode) {
-                console.warn("Game - no current scene");
+                console.warn('Game - no current scene');
             }
         }
     }
@@ -227,7 +229,7 @@ export abstract class FPGame implements IGame {
         this._progress.beginFill(0xE1B022);
         this._progress.drawRect(0, 0, 250, 25);
         this._progress.beginHole();
-        this._progress.drawRect(1, 1, 248, 23)
+        this._progress.drawRect(1, 1, 248, 23);
         this._progress.endHole();
         this._progress.endFill();
 
@@ -245,7 +247,7 @@ export abstract class FPGame implements IGame {
         this._progress.beginFill(0xE1B022);
         this._progress.drawRect(0, 0, 250, 25);
         this._progress.beginHole();
-        this._progress.drawRect(holeX, 1, holeWidth, 23)
+        this._progress.drawRect(holeX, 1, holeWidth, 23);
         this._progress.endHole();
         this._progress.endFill();
 
