@@ -17,6 +17,8 @@ enum SceneResources {
 }
 
 class Card {
+    private static _lastId: number = 0;
+    public id: number = 0;
     public cardFaceUp = false;
     public resource: PIXI.LoaderResource;
     public sprite: PIXI.Sprite;
@@ -28,12 +30,14 @@ class Card {
         this.resource = resource;
         this.sprite = new PIXI.Sprite(this.resource.texture);
         this.scale = cardWidth / this.sprite.width;
+        this.id = ++Card._lastId;
     }
 }
 
 export class ConcentrationGamePlayScene extends Scene {
     public sound: PIXI.sound.Sound;
     public cards: Card[] = [];
+    public selected: Card[] = [];
 
     public pauseText: PIXI.Text;
 
@@ -101,10 +105,27 @@ export class ConcentrationGamePlayScene extends Scene {
             card.sprite.scale.y = card.scale;
             card.sprite.anchor.x = card.anchor;
             card.sprite.anchor.y = card.anchor;
-            card.sprite.position.x = (col * (cardWidth + 10)) + (cardWidth / 2);
-            card.sprite.position.y = row * (card.sprite.height + 10) + (card.sprite.height / 2);
-            card.sprite.interactive = true;
-            card.sprite.buttonMode = true;
+
+            const x = (col * (cardWidth + 10)) + (cardWidth / 2);
+            const y = row * (card.sprite.height + 10) + (card.sprite.height / 2);
+
+            card.sprite.position.x = Math.random() * 600;
+            card.sprite.position.y = -Math.random() * 100 - 100;
+            card.sprite.rotation = Math.random() * 2 * 3.14;
+
+            this.createTween(card.sprite)
+                .onStart(() => {
+                    card.sprite.interactive = false;
+                    card.sprite.buttonMode = false;
+                })
+                .to({ x: x, y: y, rotation: 0}, 2400 + Math.random() * 1200)
+                .easing(TWEEN.Easing.Elastic.Out)
+                .onComplete(() => {
+                    card.sprite.interactive = true;
+                    card.sprite.buttonMode = true;
+                })
+            .start();
+
             card.sprite.zIndex = 2;
 
             const atMaxCol = (col + 1) >= numCols;
@@ -116,12 +137,19 @@ export class ConcentrationGamePlayScene extends Scene {
     }
 
     private _onCardClick(card: Card) {
+        if (this.selected.some(x => x.id === card.id)) {
+            // Card is flipped over
+            return;
+        }
+
         this.getResource(SceneResources.WhistleSound).sound.play();
 
         const scale = {y: card.sprite.scale.y};
 
         this.createTween(scale)
-            .onStart(() => card.sprite.interactive = false)
+            .onStart(() => {
+                card.sprite.interactive = false;
+            })
             .to({y: 0}, 100)
             .easing(TWEEN.Easing.Quadratic.Out)
             .onUpdate(result => {
@@ -142,9 +170,16 @@ export class ConcentrationGamePlayScene extends Scene {
                 .onUpdate(result => {
                     card.sprite.scale.y = result.y;
                 })
-                .onComplete(() => card.sprite.interactive = true)
+                .onComplete(() => {
+                    card.sprite.interactive = true;
+                    this.selected.push(card);
+
+                    if (this.selected.length === 2) {
+                        this._removeCards();
+                    }
+                })
             )
-            .start();
+        .start();
     }
 
     private _getInputController(): InputController {
@@ -165,5 +200,41 @@ export class ConcentrationGamePlayScene extends Scene {
         } else if (Keyboard.isKeyActive(e, Keys.KeyX)) {
             GameController.getGameInstance<ConcentrationGame>().goToTestScene();
         }
+    }
+
+    private _removeCards() {
+        if (this.selected.length < 2) {
+            return;
+        }
+
+        this._removeCardTween(this.selected[0]);
+        this._removeCardTween(this.selected[1]);
+    }
+
+    private _removeCardTween(c: Card): TWEEN.Tween {
+        const tweenProperties = {
+            width: c.sprite.width,
+            height: c.sprite.height,
+            x: c.sprite.position.x,
+            y: c.sprite.position.y,
+            alpha: c.sprite.alpha
+        };
+
+        return this.createTween(tweenProperties)
+            .delay(1000)
+            .to({ width: "+100", height: "+100", x: "-50", y: "-50", alpha: 0}, 200)
+            .onUpdate(update => {
+                c.sprite.width = update.width;
+                c.sprite.height = update.height;
+                c.sprite.x = update.x;
+                c.sprite.y = update.y;
+                c.sprite.alpha = update.alpha;
+            })
+            .easing(TWEEN.Easing.Linear.None)
+            .onComplete(() => {
+                this.removeChild(c.sprite);
+                this.selected = this.selected.filter(x => x.id !== c.id);
+            })
+        .start();
     }
 }
