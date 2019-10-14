@@ -4,9 +4,12 @@ import 'pixi-sound';
 import * as TWEEN from '@tweenjs/tween.js';
 import {Scene} from '../../../scene';
 import {Keyboard, Keys} from '../../../keyboard';
-import {InputController} from 'src/shared/game/input-controller';
+import {InputController} from '../../../input-controller';
 import {ConcentrationGame} from '../../concentration-game';
-import {GameController} from 'src/shared/game/game-controller';
+import {GameController} from '../../../game-controller';
+import { UIController } from '../../../ui-controller';
+import { UISprite } from '../../../ui/ui-sprite';
+import { Button } from '../../../ui/components/button';
 
 const cardWidth = 75;
 const numCols = 16;
@@ -38,6 +41,7 @@ export class ConcentrationGamePlayScene extends Scene {
     public sound: PIXI.sound.Sound;
     public cards: Card[] = [];
     public selected: Card[] = [];
+    public btn: Button;
 
     public pauseText: PIXI.Text;
 
@@ -81,17 +85,29 @@ export class ConcentrationGamePlayScene extends Scene {
     }
 
     private _init() {
-        this.createCardStack();
-        // this.card = new PIXI.Sprite(this.getResource(SceneResources.CardBackImage).texture);
-        this.cards.forEach(card => {
-            this.addChild(card.sprite);
-            card.sprite.on('mouseup', () => this._onCardClick(card));
-            card.sprite.on('touchend', () => this._onCardClick(card));
-        });
+        // this.createCardStack();
+        // // this.card = new PIXI.Sprite(this.getResource(SceneResources.CardBackImage).texture);
+        // this.cards.forEach(card => {
+        //     this.addChild(card.sprite);
+        //     card.sprite.on('mouseup', () => this._onCardClick(card));
+        //     card.sprite.on('touchend', () => this._onCardClick(card));
+        // });
 
 
         this.pauseText = new PIXI.Text('Paused', {fontFamily: 'Arial', fontSize: 48, fill: 0xff1010, align: 'center'});
         this.addChild(this.pauseText);
+
+        this.btn = new Button({
+            backgroundColor: 0xff0000,
+            textColor: 0xffffff,
+            width: 250,
+            height: 50,
+            text: "Button Text",
+            x: 100,
+            y: 250
+        });
+
+        this.addChild(this.btn);
     }
 
     private _reset() {

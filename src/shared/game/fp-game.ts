@@ -12,6 +12,7 @@ import {ElementRef} from '@angular/core';
 import {SceneManager, ISceneManager} from './scene-manager';
 import {Scene} from './scene';
 import {GameController} from './game-controller';
+import { UIController } from './ui-controller';
 
 /**
  * Interface for what our games must implement.
@@ -90,6 +91,7 @@ export abstract class FPGame implements IGame {
 
         this._fpsDisplay = new PIXI.Text('', {fontSize: 14, fill: '#00ff00'});
 
+        UIController.registerComponents();
         GameController.setGameInstance(this);
 
         this.load();

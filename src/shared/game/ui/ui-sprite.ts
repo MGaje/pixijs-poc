@@ -1,4 +1,5 @@
 import { UIContainer } from './ui-container';
+import { MultiStateSprite } from './multistate-sprite';
 
 export class UISprite extends UIContainer {
     private _textObj: any;
@@ -29,8 +30,8 @@ export class UISprite extends UIContainer {
 
     public setState(state: string = 'default') {
         this.children.forEach(child => {
-            if (true) {
-                // ?
+            if (child instanceof MultiStateSprite) {
+                child.setState(state);
             }
         });
     }
