@@ -28,7 +28,6 @@ class Card {
     public scale: number;
     public anchor = 0.5;
 
-
     public constructor(resource: PIXI.LoaderResource) {
         this.resource = resource;
         this.sprite = new PIXI.Sprite(this.resource.texture);
@@ -100,14 +99,15 @@ export class ConcentrationGamePlayScene extends Scene {
         this.btn = new Button({
             backgroundColor: 0xff0000,
             textColor: 0xffffff,
-            width: 150,
-            height: 25,
+            textHoverColor: 0x0000ff,
+            width: 250,
+            height: 50,
             text: "Button Text",
             x: 100,
             y: 250
         });
 
-        this.addChild(this.btn);
+        this.addChild(this.btn.getPixiSprite());
     }
 
     private _reset() {

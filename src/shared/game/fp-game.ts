@@ -83,7 +83,8 @@ export abstract class FPGame implements IGame {
 
         this.app = new PIXI.Application({
             width: w, height: h,
-            antialias: true
+            antialias: true,
+            resolution: window.devicePixelRatio
         });
 
         this._stageElement = stageElement;
@@ -235,8 +236,8 @@ export abstract class FPGame implements IGame {
         this._progress.endHole();
         this._progress.endFill();
 
-        this._progress.position.x = (this.app.view.width / 2) - (this._progress.width / 2);
-        this._progress.position.y = (this.app.view.height / 2) - (this._progress.height / 2);
+        this._progress.position.x = ((this.app.view.width / window.devicePixelRatio) / 2) - (this._progress.width / 2);
+        this._progress.position.y = ((this.app.view.height / window.devicePixelRatio) / 2) - (this._progress.height / 2);
 
         this.app.stage.addChild(this._progress);
     }
@@ -253,8 +254,8 @@ export abstract class FPGame implements IGame {
         this._progress.endHole();
         this._progress.endFill();
 
-        this._progress.position.x = (this.app.view.width / 2) - (this._progress.width / 2);
-        this._progress.position.y = (this.app.view.height / 2) - (this._progress.height / 2);
+        this._progress.position.x = ((this.app.view.width / window.devicePixelRatio) / 2) - (this._progress.width / 2);
+        this._progress.position.y = ((this.app.view.height / window.devicePixelRatio) / 2) - (this._progress.height / 2);
     }
 
     private _destroyProgressbar() {
