@@ -14,7 +14,7 @@ export enum InputEvents {
 };
 
 /**
- * Abstract class built around basae ui functionalty.
+ * Abstract class built around base ui functionalty.
  */
 export abstract class InputBase {
     protected inputHandlers: Map<string, InputHandler> = new Map<string, InputHandler>();
@@ -57,6 +57,10 @@ export abstract class InputBase {
     public onMouseOut(h: InputHandler) {
         this.inputHandlers.set(InputEvents.MouseOut, h);
     }
+
+    /**
+     * TODO: Add destroy() method to free some memory.
+     */
 
     /**
      * Abstract handleEvents - not all ui elements will handle all input events.

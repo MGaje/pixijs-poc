@@ -7,14 +7,16 @@ import { NumberFormatStyle } from '@angular/common';
 // String enum of key names.
 export enum Keys {
     KeyF = "KeyF",
-    KeyX = "KeyX"
+    KeyX = "KeyX",
+    KeyP = "KeyP"
 };
 
 // Enum of keycodes whose properties match those of key names in the above
 // string enum.
 enum KeyCodes {
     KeyF = 70,
-    KeyX = 88
+    KeyX = 88,
+    KeyP = 80
 }
 
 /**

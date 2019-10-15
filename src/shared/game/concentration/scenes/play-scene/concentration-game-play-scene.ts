@@ -8,7 +8,6 @@ import {InputController} from '../../../input-controller';
 import {ConcentrationGame} from '../../concentration-game';
 import {GameController} from '../../../game-controller';
 import { UIController } from '../../../ui-controller';
-import { UISprite } from '../../../ui/ui-sprite';
 import { Button } from '../../../ui/components/button';
 
 const cardWidth = 75;
@@ -16,7 +15,8 @@ const numCols = 16;
 
 enum SceneResources {
     CardBackImage = 'card-back.png',
-    WhistleSound = 'whistle.mp3'
+    WhistleSound = 'whistle.mp3',
+    BurstImage = 'burst.png'
 }
 
 class Card {
@@ -41,6 +41,7 @@ export class ConcentrationGamePlayScene extends Scene {
     public cards: Card[] = [];
     public selected: Card[] = [];
     public btn: Button;
+    public burstSprite: PIXI.Sprite;
 
     public pauseText: PIXI.Text;
 
@@ -97,14 +98,19 @@ export class ConcentrationGamePlayScene extends Scene {
         this.addChild(this.pauseText);
 
         this.btn = new Button({
-            backgroundColor: 0xff0000,
+            id: "button",
+            text: "New Button",
             textColor: 0xffffff,
-            textHoverColor: 0x0000ff,
+            backgroundColor: 0x0000ff,
+            backgroundHoverColor: 0x000064,
             width: 250,
             height: 50,
-            text: "Button Text",
             x: 100,
             y: 250
+        });
+
+        this.btn.onMouseDown(() => {
+            alert('mouse down!');
         });
 
         this.addChild(this.btn.getPixiSprite());
@@ -215,6 +221,12 @@ export class ConcentrationGamePlayScene extends Scene {
             }
         } else if (Keyboard.isKeyActive(e, Keys.KeyX)) {
             GameController.getGameInstance<ConcentrationGame>().goToTestScene();
+        }
+        else if (Keyboard.isKeyActive(e, Keys.KeyP)) {
+            this.children.filter(x => x.interactive).forEach(x => {
+                x.interactive = false;
+                x.buttonMode = false;
+            });
         }
     }
 

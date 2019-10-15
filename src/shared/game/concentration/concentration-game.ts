@@ -50,6 +50,7 @@ export class ConcentrationGame extends FPGame {
             'assets/sprite.mp3',
             'assets/success.mp3',
             'assets/sword.mp3',
+            "assets/burst.png",
             ...ConcentrationGame.cardAssets()
         ]);
 
