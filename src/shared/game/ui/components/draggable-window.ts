@@ -48,18 +48,21 @@ export class DraggableWindow extends WindowBase {
     private _onDragStart(e: PIXI.interaction.InteractionEvent) {
         this._data = e.data;
 
-        const anchorPos = this._data.getLocalPosition(this.sprite);
-        this._pos = anchorPos;
-        console.log('anchor pos: ' + anchorPos.x + ', ' + anchorPos.y);
-        //this.graphicsContext.alpha = 0.5;
+        if (!this._pos) {
+            const anchorPos = this._data.getLocalPosition(this.sprite);
+            this._pos = anchorPos;
+            console.log('anchor pos: ' + anchorPos.x + ', ' + anchorPos.y);
+        }
+
+        this.graphicsContext.alpha = 0.5;
         this._dragging = true;
     }
 
     private _onDragEnd() {
-        //this.graphicsContext.alpha = 1;
+        this.graphicsContext.alpha = 1;
         this._dragging = false;
         this._data = null;
-        this.sprite.anchor.set(0, 0);
+        this._pos = null;
     }
 
     private _onDragMove() {
@@ -67,7 +70,7 @@ export class DraggableWindow extends WindowBase {
             const newPosition = this._data.getLocalPosition(this.sprite.parent);
             const relPosition = this._data.getLocalPosition(this._titleBarContext);
             console.log('rel pos: ' + relPosition.x + ', ' + relPosition.y);
-            this.sprite.position.set(newPosition.x, newPosition.y);
+            this.sprite.position.set(newPosition.x - this._pos.x, newPosition.y - this._pos.y);
         }
     }
 }
