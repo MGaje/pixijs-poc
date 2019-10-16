@@ -7,13 +7,11 @@ import { IUISettings } from '../ui-settings';
 export interface IButtonSettings extends IUISettings {
     text: string,
     textColor: number,
-    backgroundColor: number,
+    texture?: PIXI.Texture,
+    textureHover?: PIXI.Texture,
+    backgroundColor?: number,
     textHoverColor?: number,
-    backgroundHoverColor?: number,
-    width?: number,
-    height?: number,
-    x?: number,
-    y?: number
+    backgroundHoverColor?: number
 };
 
 export class Button extends InputComponent {
@@ -45,12 +43,23 @@ export class Button extends InputComponent {
 
     protected handleEvents() {
         this.sprite.on('mousedown', () => {
-            this.inputHandlers.get(InputEvents.MouseDown)();
+            if (this.handlers.has(InputEvents.MouseDown)) {
+                this.handlers.get(InputEvents.MouseDown)();
+            }
         });
+
+        this.sprite.on('mouseup', () => {
+            if (this.handlers.has(InputEvents.MouseUp)) {
+                this.handlers.get(InputEvents.MouseUp)();
+            }
+        })
 
         this.sprite.on('mouseover', () => {
             if (this._settings.backgroundHoverColor) {
-                this._drawRectangle(this._settings.backgroundHoverColor);
+                this._drawRect(this._settings.backgroundHoverColor);
+            }
+            else if (this._settings.textureHover) {
+                this._drawTexturedRect(this._settings.textureHover);
             }
 
             if (this._settings.textHoverColor) {
@@ -60,7 +69,10 @@ export class Button extends InputComponent {
 
         this.sprite.on('mouseout', () => {
             if (this._settings.backgroundHoverColor) {
-                this._drawRectangle(this._settings.backgroundColor);
+                this._drawRect(this._settings.backgroundColor);
+            }
+            else if (this._settings.textureHover) {
+                this._drawTexturedRect(this._settings.texture);
             }
 
             if (this._settings.textHoverColor) {
@@ -80,16 +92,28 @@ export class Button extends InputComponent {
     }
 
     private _drawBackground() {
-        this._drawRectangle(this._settings.backgroundColor);
+        if (this._settings.backgroundColor) {
+            this._drawRect(this._settings.backgroundColor);
+        }
+        else if (this._settings.texture) {
+            this._drawTexturedRect(this._settings.texture);
+        }
 
         this.sprite.addChild(this._graphics);
     }
 
-    private _drawRectangle(color: number) {
+    private _drawRect(color: number) {
         this._graphics.clear();
         this._graphics.beginFill(color);
         this._graphics.drawRect(0, 0, this._settings.width, this._settings.height);
         this._graphics.endFill();
+    }
+
+    private _drawTexturedRect(t: PIXI.Texture) {
+        this._graphics.clear();
+        this._graphics
+            .beginTextureFill(t)
+            .drawRect(0, 0, this._settings.width, this._settings.height);
     }
 
     private _drawText(color: number) {

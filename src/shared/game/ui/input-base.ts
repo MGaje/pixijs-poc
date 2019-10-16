@@ -17,7 +17,7 @@ export enum InputEvents {
  * Abstract class built around base ui functionalty.
  */
 export abstract class InputBase {
-    protected inputHandlers: Map<string, InputHandler> = new Map<string, InputHandler>();
+    protected handlers: Map<string, InputHandler> = new Map<string, InputHandler>();
 
     /**
      * Default constructor.
@@ -31,7 +31,7 @@ export abstract class InputBase {
      * @param h The callback when the 'mousedown' event occurs.
      */
     public onMouseDown(h: InputHandler) {
-        this.inputHandlers.set(InputEvents.MouseDown, h);
+        this.handlers.set(InputEvents.MouseDown, h);
     }
 
     /**
@@ -39,7 +39,7 @@ export abstract class InputBase {
      * @param h The callback when the 'mouseup' event occurs.
      */
     public onMouseUp(h: InputHandler) {
-        this.inputHandlers.set(InputEvents.MouseUp, h);
+        this.handlers.set(InputEvents.MouseUp, h);
     }
 
     /**
@@ -47,7 +47,7 @@ export abstract class InputBase {
      * @param h The callback when the 'mouseover' event occurs.
      */
     public onMouseOver(h: InputHandler) {
-        this.inputHandlers.set(InputEvents.MouseOver, h);
+        this.handlers.set(InputEvents.MouseOver, h);
     }
 
     /**
@@ -55,7 +55,7 @@ export abstract class InputBase {
      * @param h The callback when the 'mouseup' event occurs.
      */
     public onMouseOut(h: InputHandler) {
-        this.inputHandlers.set(InputEvents.MouseOut, h);
+        this.handlers.set(InputEvents.MouseOut, h);
     }
 
     /**

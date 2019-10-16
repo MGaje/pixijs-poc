@@ -20,4 +20,12 @@ export abstract class InputComponent extends InputBase implements IUIDrawable {
     public getPixiSprite(): PIXI.Sprite {
         return this.sprite;
     }
+
+    public isVisible(): boolean {
+        return this.sprite.visible;
+    }
+
+    public setVisibility(visible: boolean) {
+        this.sprite.visible = visible;
+    }
 }

@@ -12,6 +12,7 @@ import {ElementRef} from '@angular/core';
 import {SceneManager, ISceneManager} from './scene-manager';
 import {Scene} from './scene';
 import {GameController} from './game-controller';
+import { CanvasUtil } from './ui/util/canvas';
 
 /**
  * Interface for what our games must implement.

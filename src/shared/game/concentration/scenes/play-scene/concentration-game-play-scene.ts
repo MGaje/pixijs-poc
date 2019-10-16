@@ -9,6 +9,8 @@ import {ConcentrationGame} from '../../concentration-game';
 import {GameController} from '../../../game-controller';
 import { UIController } from '../../../ui-controller';
 import { Button } from '../../../ui/components/button';
+import { CanvasUtil } from '../../../ui/util/canvas';
+import { DraggableWindow } from '../../../ui/components/draggable-window';
 
 const cardWidth = 75;
 const numCols = 16;
@@ -41,7 +43,7 @@ export class ConcentrationGamePlayScene extends Scene {
     public cards: Card[] = [];
     public selected: Card[] = [];
     public btn: Button;
-    public burstSprite: PIXI.Sprite;
+    public win: DraggableWindow;
 
     public pauseText: PIXI.Text;
 
@@ -109,11 +111,38 @@ export class ConcentrationGamePlayScene extends Scene {
             y: 250
         });
 
-        this.btn.onMouseDown(() => {
-            alert('mouse down!');
+        this.btn.onMouseUp(() => {
+            if (!this.win.isVisible()) {
+                this.win.open();
+            }
+            else {
+                this.win.close();
+            }
         });
 
         this.addChild(this.btn.getPixiSprite());
+
+        this.win = new DraggableWindow({
+            id: "simplewin",
+            backgroundColor: 0x006400,
+            titlebarColor: 0x00ff00,
+            title: "Title",
+            alpha: 1,
+            width: 500,
+            height: 500,
+            x: 400,
+            y: 400
+        });
+
+        this.win.onBeforeLoad(() => {
+            alert('some loading stuff');
+        });
+
+        this.win.onBeforeUnload(() => {
+            alert('some cleanup stuff');
+        });
+
+        this.addChild(this.win.getPixiSprite());
     }
 
     private _reset() {
