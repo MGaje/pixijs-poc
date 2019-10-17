@@ -160,6 +160,9 @@ export class ConcentrationGamePlayScene extends Scene {
 
         this.win = new ConfirmDialogWindow({
             id: 'confirmDialog',
+            message: 'Are you sure you want to undo the last move?',
+            yesOptionText: 'Yes, Undo',
+            noOptionText: 'No',
             backgroundColor: 0xffffff,
             alpha: 1,
             width: 600,
@@ -182,7 +185,7 @@ export class ConcentrationGamePlayScene extends Scene {
 
         this.win.onClose(() => {
             this.cover.visible = false;
-        })
+        });
 
         this.addChild(this.win.getPixiSprite());
     }

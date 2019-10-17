@@ -54,7 +54,7 @@ export class DraggableWindow extends WindowBase {
     }
 
     private _onDragEnd() {
-        this.graphicsContext.alpha = 1;
+        this.sprite.alpha = 1;
         this._dragging = false;
         this._data = null;
         this._mouseRelPos = null;
