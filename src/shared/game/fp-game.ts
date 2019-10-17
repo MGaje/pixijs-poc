@@ -13,6 +13,7 @@ import {SceneManager, ISceneManager} from './scene-manager';
 import {Scene} from './scene';
 import {GameController} from './game-controller';
 import { CanvasUtil } from './ui/util/canvas';
+import { IStageMetrics } from './stage-metrics';
 
 /**
  * Interface for what our games must implement.
@@ -84,7 +85,8 @@ export abstract class FPGame implements IGame {
         this.app = new PIXI.Application({
             width: w, height: h,
             antialias: true,
-            resolution: window.devicePixelRatio
+            resolution: window.devicePixelRatio,
+            backgroundColor: 0xEEEEEE
         });
 
         this._stageElement = stageElement;
@@ -124,6 +126,16 @@ export abstract class FPGame implements IGame {
                 this.setupScenes();
                 this.app.ticker.add(delta => this._update(delta, this.app.ticker));
             });
+    }
+
+    /**
+     * Obtain the metrics of the game stage.
+     */
+    public getStageMetrics(): IStageMetrics {
+        return {
+            width: this.app.view.width / window.devicePixelRatio,
+            height: this.app.view.height / window.devicePixelRatio
+        };
     }
 
     /**

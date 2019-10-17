@@ -46,6 +46,7 @@ export abstract class Scene extends PIXI.Container {
         if (!this.isPaused()) {
             this.onUpdate(delta);
             this._tweenGroup.update();
+            TWEEN.update();
         }
 
     }

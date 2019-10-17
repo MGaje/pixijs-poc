@@ -1,3 +1,5 @@
+import * as TWEEN from '@tweenjs/tween.js';
+
 import { InputComponent } from './input-component';
 import { IUISettings } from './ui-settings';
 import { InputHandler } from './input-base';
@@ -7,7 +9,9 @@ import { InputHandler } from './input-base';
  */
 export enum WindowBaseEvents {
     OnBeforeLoad = 'onbeforeload',
-    OnBeforeUnload = 'onbeforeunload'
+    OnBeforeUnload = 'onbeforeunload',
+    OnOpen = 'onopen',
+    OnClose = 'onclose'
 };
 
 export interface IWindowBaseSettings extends IUISettings {
@@ -24,25 +28,43 @@ export abstract class WindowBase extends InputComponent {
     private _children: Map<string, InputComponent>;
 
     constructor(settings: IWindowBaseSettings) {
-        super(settings.id);
+        super(settings);
         this._children = new Map<string, InputComponent>();
+        this.sprite.zIndex = 5;
 
         this.settings = settings;
+
         this.setVisibility(false);
+        this.sprite.alpha = 0;
+
         this.sprite.alpha = settings.alpha;
         this.graphicsContext = new PIXI.Graphics();
+
+        this.sprite.sortableChildren = true;
 
         this._setupWindow();
     }
 
-    public addChild(c: InputComponent) {
+    public addChildComponent(c: InputComponent) {
+        if (this._children.has(c.getId())) {
+            console.warn(`Window with id '${this.getId()}' already has child component with id '${c.getId()}'`)
+        }
+
         this._children.set(c.getId(), c);
         this.sprite.addChild(c.getPixiSprite());
     }
 
-    public removeChild(c: InputComponent) {
+    public removeChildComponent(c: InputComponent) {
         this._children.delete(c.getId());
         this.sprite.removeChild(c.getPixiSprite());
+    }
+
+    public addPixiChild(c: PIXI.DisplayObject) {
+        this.sprite.addChild(c);
+    }
+
+    public removePixiChild(c: PIXI.DisplayObject) {
+        this.sprite.removeChild(c);
     }
 
     public onBeforeLoad(h: InputHandler) {
@@ -53,20 +75,49 @@ export abstract class WindowBase extends InputComponent {
         this.handlers.set(WindowBaseEvents.OnBeforeUnload, h);
     }
 
+    public onOpen(h: InputHandler) {
+        this.handlers.set(WindowBaseEvents.OnOpen, h);
+    }
+
+    public onClose(h: InputHandler) {
+        this.handlers.set(WindowBaseEvents.OnClose, h);
+    }
+
     public open() {
         if (this.isVisible()) {
             return;
         }
+
+        this.setVisibility(true);
+
+        const s: IWindowBaseSettings = this.getSettings<IWindowBaseSettings>();
 
         new Promise((resolve, reject) => {
             if (this.handlers.has(WindowBaseEvents.OnBeforeLoad)) {
                 this.handlers.get(WindowBaseEvents.OnBeforeLoad)();
             }
 
+            const origY: number = s.y;
+            const destY: number = origY + 100;
+
+            // new TWEEN.Tween({ alpha: 0, y: destY})
+            //     .to({ alpha: 1, y: origY }, 100)
+            //     .easing(TWEEN.Easing.Linear.None)
+            //     .onUpdate(update => {
+            //         this.sprite.alpha = update.alpha;
+            //         this.sprite.position.y = update.y;
+            //     })
+            //     .onComplete(() => {
+            //         resolve(true);
+            //     })
+            //     .start();
+
             resolve(true);
         })
         .then(() => {
-            this.setVisibility(true);
+            if (this.handlers.has(WindowBaseEvents.OnOpen)) {
+                this.handlers.get(WindowBaseEvents.OnOpen)();
+            }
         });
     }
 
@@ -75,22 +126,46 @@ export abstract class WindowBase extends InputComponent {
             return;
         }
 
+        const s: IWindowBaseSettings = this.getSettings<IWindowBaseSettings>();
+
         new Promise((resolve, reject) => {
             if (this.handlers.has(WindowBaseEvents.OnBeforeUnload)) {
                 this.handlers.get(WindowBaseEvents.OnBeforeUnload)();
             }
 
+            const origY: number = s.y;
+            const destY: number = origY + 100;
+
+            // new TWEEN.Tween({ alpha: 1, y: origY })
+            //     .to({ alpha: 0, y: destY }, 100)
+            //     .easing(TWEEN.Easing.Linear.None)
+            //     .onUpdate(update => {
+            //         this.sprite.alpha = update.alpha;
+            //         this.sprite.position.y = update.y;
+            //     })
+            //     .onComplete(() => {
+            //         resolve(true);
+            //     })
+            //     .start();
+
             resolve(true);
         })
         .then(() => {
             this.setVisibility(false);
+            if (this.handlers.has(WindowBaseEvents.OnClose)) {
+                this.handlers.get(WindowBaseEvents.OnClose)();
+            }
         });
     }
 
+    protected getComponentZIndex(): number {
+        return this.graphicsContext.zIndex + 1;
+    }
+
     protected init() {
-        //this.graphicsContext.position.set(this.settings.x, this.settings.y);
         this.sprite.position.set(this.settings.x, this.settings.y);
         this.sprite.addChild(this.graphicsContext);
+        this.sprite.sortChildren();
     }
 
     private _setupWindow() {

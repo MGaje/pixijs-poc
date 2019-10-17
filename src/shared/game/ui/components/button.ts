@@ -3,6 +3,7 @@ import { InputBase, InputHandler, InputEvents } from '../input-base';
 import { IUIDrawable } from '../ui-drawable';
 import { InputComponent } from '../input-component';
 import { IUISettings } from '../ui-settings';
+import { IButton } from 'selenium-webdriver';
 
 export interface IButtonSettings extends IUISettings {
     text: string,
@@ -15,22 +16,20 @@ export interface IButtonSettings extends IUISettings {
 };
 
 export class Button extends InputComponent {
-    private _settings: IButtonSettings;
     private _graphics: PIXI.Graphics;
     private _text: PIXI.Text;
 
     constructor(settings: IButtonSettings) {
-        super(settings.id);
+        super(settings);
 
         this.sprite.interactive = true;
         this.sprite.buttonMode = true;
-        this._settings = settings;
         this._graphics = new PIXI.Graphics();
 
-        this._init();
+        this._init(settings);
         this.handleEvents();
 
-        this.sprite.position.set(this._settings.x, this._settings.y);
+        this.sprite.position.set(settings.x, settings.y);
     }
 
     public setText(text: string) {
@@ -55,76 +54,86 @@ export class Button extends InputComponent {
         })
 
         this.sprite.on('mouseover', () => {
-            if (this._settings.backgroundHoverColor) {
-                this._drawRect(this._settings.backgroundHoverColor);
+            const s: IButtonSettings = this.getSettings<IButtonSettings>();
+
+            if (s.backgroundHoverColor) {
+                this._drawRect(s.backgroundHoverColor);
             }
-            else if (this._settings.textureHover) {
-                this._drawTexturedRect(this._settings.textureHover);
+            else if (s.textureHover) {
+                this._drawTexturedRect(s.textureHover);
             }
 
-            if (this._settings.textHoverColor) {
-                this._drawText(this._settings.textHoverColor);
+            if (s.textHoverColor) {
+                this._drawText(s.textHoverColor);
             }
         });
 
         this.sprite.on('mouseout', () => {
-            if (this._settings.backgroundHoverColor) {
-                this._drawRect(this._settings.backgroundColor);
+            const s: IButtonSettings = this.getSettings<IButtonSettings>();
+
+            if (s.backgroundHoverColor) {
+                this._drawRect(s.backgroundColor);
             }
-            else if (this._settings.textureHover) {
-                this._drawTexturedRect(this._settings.texture);
+            else if (s.textureHover) {
+                this._drawTexturedRect(s.texture);
             }
 
-            if (this._settings.textHoverColor) {
-                this._drawText(this._settings.textColor);
+            if (s.textHoverColor) {
+                this._drawText(s.textColor);
             }
         });
     }
 
-    private _init() {
+    private _init(s: IButtonSettings) {
         if (!this._graphics) {
             console.error("Could not setup button. Graphics context was not created");
             return;
         }
 
-        this._drawBackground();
-        this._drawText(this._settings.textColor);
+        this._drawBackground(s);
+        this._drawText(s.textColor);
     }
 
-    private _drawBackground() {
-        if (this._settings.backgroundColor) {
-            this._drawRect(this._settings.backgroundColor);
+    private _drawBackground(s: IButtonSettings) {
+        if (s.backgroundColor) {
+            this._drawRect(s.backgroundColor);
         }
-        else if (this._settings.texture) {
-            this._drawTexturedRect(this._settings.texture);
+        else if (s.texture) {
+            this._drawTexturedRect(s.texture);
         }
 
         this.sprite.addChild(this._graphics);
     }
 
     private _drawRect(color: number) {
+        const s: IButtonSettings = this.getSettings<IButtonSettings>();
+
         this._graphics.clear();
         this._graphics.beginFill(color);
-        this._graphics.drawRect(0, 0, this._settings.width, this._settings.height);
+        this._graphics.drawRect(0, 0, s.width, s.height);
         this._graphics.endFill();
     }
 
     private _drawTexturedRect(t: PIXI.Texture) {
+        const s: IButtonSettings = this.getSettings<IButtonSettings>();
+
         this._graphics.clear();
         this._graphics
             .beginTextureFill(t)
-            .drawRect(0, 0, this._settings.width, this._settings.height);
+            .drawRect(0, 0, s.width, s.height);
     }
 
     private _drawText(color: number) {
-        if (!this._settings.text) {
+        const s: IButtonSettings = this.getSettings<IButtonSettings>();
+
+        if (!s.text) {
             return;
         }
 
-        this._text = new PIXI.Text(this._settings.text, { fontSize: 12, fill: color });
+        this._text = new PIXI.Text(s.text, { fontSize: 12, fill: color });
         this._text.anchor.set(0.5, 0.5);
-        this._text.x = (this._settings.width) / 2;
-        this._text.y = (this._settings.height) / 2;
+        this._text.x = (s.width) / 2;
+        this._text.y = (s.height) / 2;
 
         this.sprite.addChild(this._text);
     }

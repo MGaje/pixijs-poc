@@ -1,4 +1,5 @@
 import { FPGame } from './fp-game';
+import { IStageMetrics } from './stage-metrics';
 
 export class GameController {
     private static _gameInstance: FPGame;
@@ -17,5 +18,16 @@ export class GameController {
         }
 
         return GameController.getGameInstance<any>().gotoScene(name);
+    }
+
+    public static getStageMetrics(): IStageMetrics {
+        if (!GameController._gameInstance) {
+            return {
+                width: 0,
+                height: 0
+            };
+        }
+
+        return GameController._gameInstance.getStageMetrics();
     }
 }

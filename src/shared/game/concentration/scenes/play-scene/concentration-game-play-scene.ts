@@ -11,6 +11,8 @@ import { UIController } from '../../../ui-controller';
 import { Button } from '../../../ui/components/button';
 import { CanvasUtil } from '../../../ui/util/canvas';
 import { DraggableWindow } from '../../../ui/components/draggable-window';
+import { ConfirmDialogWindow } from 'src/shared/game/ui/components/confirm-dialog-window';
+import { IStageMetrics } from 'src/shared/game/stage-metrics';
 
 const cardWidth = 75;
 const numCols = 16;
@@ -43,7 +45,8 @@ export class ConcentrationGamePlayScene extends Scene {
     public cards: Card[] = [];
     public selected: Card[] = [];
     public btn: Button;
-    public win: DraggableWindow;
+    public win: ConfirmDialogWindow;
+    public cover: PIXI.Graphics;
 
     public pauseText: PIXI.Text;
 
@@ -95,6 +98,19 @@ export class ConcentrationGamePlayScene extends Scene {
         //     card.sprite.on('touchend', () => this._onCardClick(card));
         // });
 
+        const stageMetrics: IStageMetrics = GameController.getStageMetrics();
+
+        this.cover = new PIXI.Graphics();
+
+        this.cover = new PIXI.Graphics();
+        this.cover.beginFill(0x000000);
+        this.cover.drawRect(0, 0, stageMetrics.width, stageMetrics.height);
+        this.cover.endFill();
+        this.cover.alpha = 0.75;
+        this.cover.zIndex = 1;
+        this.cover.visible = false;
+
+        this.addChild(this.cover);
 
         this.pauseText = new PIXI.Text('Paused', {fontFamily: 'Arial', fontSize: 48, fill: 0xff1010, align: 'center'});
         this.addChild(this.pauseText);
@@ -122,25 +138,51 @@ export class ConcentrationGamePlayScene extends Scene {
 
         this.addChild(this.btn.getPixiSprite());
 
-        this.win = new DraggableWindow({
-            id: "simplewin",
-            backgroundColor: 0x006400,
-            titlebarColor: 0x00ff00,
-            title: "Title",
+        // this.win = new DraggableWindow({
+        //     id: "simplewin",
+        //     backgroundColor: 0x006400,
+        //     titlebarColor: 0x00ff00,
+        //     title: "Title",
+        //     alpha: 1,
+        //     width: 500,
+        //     height: 500,
+        //     x: 400,
+        //     y: 400
+        // });
+
+        // this.win.onBeforeLoad(() => {
+        //     alert('some loading stuff');
+        // });
+
+        // this.win.onBeforeUnload(() => {
+        //     alert('some cleanup stuff');
+        // });
+
+        this.win = new ConfirmDialogWindow({
+            id: 'confirmDialog',
+            backgroundColor: 0xffffff,
             alpha: 1,
-            width: 500,
-            height: 500,
-            x: 400,
-            y: 400
+            width: 600,
+            height: 250,
+            x: (stageMetrics.width - 600) / 2,
+            y: (stageMetrics.height - 250) / 2
+        });
+
+        this.win.onCancel(() => {
+            alert('canceled!');
+        });
+
+        this.win.onConfirm(() => {
+            alert('confirmed!');
         });
 
         this.win.onBeforeLoad(() => {
-            alert('some loading stuff');
+            this.cover.visible = true;
         });
 
-        this.win.onBeforeUnload(() => {
-            alert('some cleanup stuff');
-        });
+        this.win.onClose(() => {
+            this.cover.visible = false;
+        })
 
         this.addChild(this.win.getPixiSprite());
     }
