@@ -12,7 +12,8 @@ export interface IButtonSettings extends IUISettings {
     textureHover?: PIXI.Texture,
     backgroundColor?: number,
     textHoverColor?: number,
-    backgroundHoverColor?: number
+    backgroundHoverColor?: number,
+    accessibilityTitle?: string
 };
 
 export class Button extends InputComponent {
@@ -92,6 +93,11 @@ export class Button extends InputComponent {
 
         this._drawBackground(s);
         this._drawText(s.textColor);
+
+        if (s.accessibilityTitle) {
+            this.sprite.accessible = true;
+            this.sprite.accessibleTitle = s.accessibilityTitle;
+        }
     }
 
     private _drawBackground(s: IButtonSettings) {

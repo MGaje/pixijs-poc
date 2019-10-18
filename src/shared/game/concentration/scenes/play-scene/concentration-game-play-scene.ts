@@ -124,7 +124,8 @@ export class ConcentrationGamePlayScene extends Scene {
             width: 250,
             height: 50,
             x: 100,
-            y: 250
+            y: 250,
+            accessibilityTitle: 'Test Accessibility Title From Concentration Game Test Scene'
         });
 
         this.btn.onMouseUp(() => {
