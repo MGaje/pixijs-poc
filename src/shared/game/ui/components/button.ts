@@ -15,7 +15,10 @@ export interface IButtonSettings extends IUISettings {
     textHoverColor?: number,
     backgroundHoverColor?: number,
     backgroundActiveColor?: number,
-    accessibilityTitle?: string
+    accessibilityTitle?: string,
+    dropShadow: {
+
+    }
 };
 
 export class Button extends InputComponent {
@@ -25,6 +28,8 @@ export class Button extends InputComponent {
 
     constructor(settings: IButtonSettings) {
         super(settings);
+
+        this.sprite.sortableChildren = true;
 
         this.sprite.interactive = true;
         this.sprite.buttonMode = true;
@@ -112,6 +117,7 @@ export class Button extends InputComponent {
 
         this._drawBackground(s);
         this._drawText(s.textColor);
+        //this._drawDropShadow(s);
 
         if (s.accessibilityTitle) {
             this.sprite.accessible = true;
@@ -161,5 +167,22 @@ export class Button extends InputComponent {
         this._text.y = (s.height) / 2;
 
         this.sprite.addChild(this._text);
+    }
+
+    private _drawDropShadow(s: IButtonSettings) {
+        const dropShadowSprite: PIXI.Sprite = new PIXI.Sprite();
+        dropShadowSprite.zIndex = this.sprite.zIndex - 1;
+
+        const blurFilter: PIXI.filters.BlurFilter = new PIXI.filters.BlurFilter();
+        blurFilter.blur = 5;
+        dropShadowSprite.filters = [blurFilter];
+
+        const dropShadowGraphics: PIXI.Graphics = new PIXI.Graphics();
+        dropShadowGraphics.beginFill(0x000000, 0.75);
+        dropShadowGraphics.drawRect(3, 3, s.width, s.height);
+        dropShadowGraphics.endFill();
+
+        dropShadowSprite.addChild(dropShadowGraphics);
+        this.sprite.addChild(dropShadowSprite);
     }
 }
