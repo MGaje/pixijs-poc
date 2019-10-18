@@ -121,6 +121,7 @@ export class ConcentrationGamePlayScene extends Scene {
             textColor: 0xffffff,
             backgroundColor: 0x0000ff,
             backgroundHoverColor: 0x000064,
+            backgroundActiveColor: 0x00ff00,
             width: 250,
             height: 50,
             x: 100,

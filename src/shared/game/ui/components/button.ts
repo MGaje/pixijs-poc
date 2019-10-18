@@ -10,15 +10,18 @@ export interface IButtonSettings extends IUISettings {
     textColor: number,
     texture?: PIXI.Texture,
     textureHover?: PIXI.Texture,
+    textureActive?: PIXI.Texture,
     backgroundColor?: number,
     textHoverColor?: number,
     backgroundHoverColor?: number,
+    backgroundActiveColor?: number,
     accessibilityTitle?: string
 };
 
 export class Button extends InputComponent {
     private _graphics: PIXI.Graphics;
     private _text: PIXI.Text;
+    private _isActivated: boolean;
 
     constructor(settings: IButtonSettings) {
         super(settings);
@@ -42,21 +45,39 @@ export class Button extends InputComponent {
     }
 
     protected handleEvents() {
+        const s: IButtonSettings = this.getSettings<IButtonSettings>();
+
         this.sprite.on('mousedown', () => {
             if (this.handlers.has(InputEvents.MouseDown)) {
                 this.handlers.get(InputEvents.MouseDown)();
             }
+
+            if (s.backgroundActiveColor) {
+                this._drawRect(s.backgroundActiveColor);
+            }
+            else if (s.textureActive) {
+                this._drawTexturedRect(s.textureActive);
+            }
+
+            this._isActivated = true;
         });
 
         this.sprite.on('mouseup', () => {
             if (this.handlers.has(InputEvents.MouseUp)) {
                 this.handlers.get(InputEvents.MouseUp)();
             }
+
+            if (s.backgroundActiveColor) {
+                this._drawRect(s.backgroundColor);
+            }
+            else if (s.textureActive) {
+                this._drawTexturedRect(s.textureActive);
+            }
+
+            this._isActivated = false;
         })
 
         this.sprite.on('mouseover', () => {
-            const s: IButtonSettings = this.getSettings<IButtonSettings>();
-
             if (s.backgroundHoverColor) {
                 this._drawRect(s.backgroundHoverColor);
             }
@@ -70,8 +91,6 @@ export class Button extends InputComponent {
         });
 
         this.sprite.on('mouseout', () => {
-            const s: IButtonSettings = this.getSettings<IButtonSettings>();
-
             if (s.backgroundHoverColor) {
                 this._drawRect(s.backgroundColor);
             }
