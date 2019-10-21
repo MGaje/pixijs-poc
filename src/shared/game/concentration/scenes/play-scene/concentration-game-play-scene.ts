@@ -21,7 +21,9 @@ enum SceneResources {
     CardBackImage = 'card-back.png',
     WhistleSound = 'whistle.mp3',
     BurstImage = 'burst.png',
-    ApplauseSound = 'applause.mp3'
+    ApplauseSound = 'applause.mp3',
+    UndoButton = 'undo-200-8.png',
+    UndoButtonActive = 'undo-active-200-8.png'
 }
 
 class Card {
@@ -46,6 +48,7 @@ export class ConcentrationGamePlayScene extends Scene {
     public cards: Card[] = [];
     public selected: Card[] = [];
     public btn: Button;
+    public btn2: Button;
     public win: ConfirmDialogWindow;
     public cover: PIXI.Graphics;
 
@@ -116,14 +119,16 @@ export class ConcentrationGamePlayScene extends Scene {
 
         this.btn = new Button({
             id: "button",
-            text: "Button Test",
-            symbol: FontAwesomeSymbols.Times,
+            //text: "Button Test",
+            //symbol: FontAwesomeSymbols.Times,
             textColor: 0xffffff,
-            backgroundColor: 0x0000ff,
-            backgroundHoverColor: 0x000064,
-            backgroundActiveColor: 0x00ff00,
-            width: 250,
-            height: 50,
+            texture: this.getResource(SceneResources.UndoButton).texture,
+            textureActive: this.getResource(SceneResources.UndoButtonActive).texture,
+            //backgroundColor: 0x0000ff,
+            //backgroundHoverColor: 0x000064,
+            //backgroundActiveColor: 0x00ff00,
+            width: 200,
+            height: 77,
             x: 100,
             y: 250,
             accessibilityTitle: 'Test Accessibility Title From Concentration Game Test Scene'
@@ -139,6 +144,23 @@ export class ConcentrationGamePlayScene extends Scene {
         });
 
         this.addChild(this.btn.getPixiSprite());
+
+        this.btn2 = new Button({
+            id: "button2",
+            text: "Undo",
+            symbol: FontAwesomeSymbols.Undo,
+            textColor: 0xffffff,
+            backgroundColor: 0x0000ff,
+            //backgroundHoverColor: 0x000064,
+            backgroundActiveColor: 0x00ff00,
+            width: 300,
+            height: 154,
+            x: 500,
+            y: 250,
+            accessibilityTitle: 'Test Accessibility Title From Concentration Game Test Scene'
+        });
+
+        this.addChild(this.btn2.getPixiSprite());
 
         // this.win = new DraggableWindow({
         //     id: "simplewin",

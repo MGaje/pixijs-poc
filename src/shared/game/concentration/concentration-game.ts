@@ -35,6 +35,8 @@ export class ConcentrationGame extends FPGame {
             'assets/card-back.png',
             'assets/applause.mp3',
             'assets/burst.png',
+            'assets/undo-200-8.png',
+            'assets/undo-active-200-8.png',
             ...ConcentrationGame.cardAssets()
         ]);
 

@@ -7,8 +7,8 @@ import { IButton } from 'selenium-webdriver';
 
 export interface IButtonSettings extends IUISettings {
     symbol?: string,
-    text: string,
-    textColor: number,
+    text?: string,
+    textColor?: number,
     fontSize?: number,
     texture?: PIXI.Texture,
     textureHover?: PIXI.Texture,
@@ -83,11 +83,26 @@ export class Button extends InputComponent {
                 this._drawRect(s.backgroundColor);
             }
             else if (s.textureActive) {
-                this._drawTexturedRect(s.textureActive);
+                this._drawTexturedRect(s.texture);
             }
 
             this._isActivated = false;
-        })
+        });
+
+        this.sprite.on('pointerupoutside', () => {
+            if (this.handlers.has(InputEvents.PointerUp)) {
+                this.handlers.get(InputEvents.PointerUp)();
+            }
+
+            if (s.backgroundActiveColor) {
+                this._drawRect(s.backgroundColor);
+            }
+            else if (s.textureActive) {
+                this._drawTexturedRect(s.texture);
+            }
+
+            this._isActivated = false;
+        });
 
         this.sprite.on('pointerover', () => {
             if (s.backgroundHoverColor) {
@@ -127,9 +142,12 @@ export class Button extends InputComponent {
         if (s.symbol) {
             this._calculateSymbolMetrics(s);
         }
-        this._calculateTextMetrics(s);
 
-        this._drawText(s.textColor);
+        if (s.text) {
+            this._calculateTextMetrics(s);
+            this._drawText(s.textColor);
+        }
+
         //this._drawDropShadow(s);
 
         if (s.accessibilityTitle) {
@@ -161,10 +179,8 @@ export class Button extends InputComponent {
     private _drawTexturedRect(t: PIXI.Texture) {
         const s: IButtonSettings = this.getSettings<IButtonSettings>();
 
-        this._graphics.clear();
-        this._graphics
-            .beginTextureFill(t)
-            .drawRect(0, 0, s.width, s.height);
+        this.sprite.texture = t;
+        this.sprite.scale.set(s.width / t.width, s.height / t.height);
     }
 
     private _drawText(color: number) {

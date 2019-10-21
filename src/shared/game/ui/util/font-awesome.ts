@@ -5,5 +5,6 @@ export enum FontAwesomeSymbols {
     Arrows = "\uF047",
     Times = "\uF00d",
     Plus = "\uF067",
-    IdCard = "\uF2C2"
+    IdCard = "\uF2C2",
+    Undo = "\uF0E2"
 }
