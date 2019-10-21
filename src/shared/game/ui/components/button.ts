@@ -6,8 +6,10 @@ import { IUISettings } from '../ui-settings';
 import { IButton } from 'selenium-webdriver';
 
 export interface IButtonSettings extends IUISettings {
+    symbol?: string,
     text: string,
     textColor: number,
+    fontSize?: number,
     texture?: PIXI.Texture,
     textureHover?: PIXI.Texture,
     textureActive?: PIXI.Texture,
@@ -15,19 +17,22 @@ export interface IButtonSettings extends IUISettings {
     textHoverColor?: number,
     backgroundHoverColor?: number,
     backgroundActiveColor?: number,
-    accessibilityTitle?: string,
-    dropShadow: {
-
-    }
+    accessibilityTitle?: string
 };
 
 export class Button extends InputComponent {
     private _graphics: PIXI.Graphics;
     private _text: PIXI.Text;
+    private _textMetrics: PIXI.TextMetrics;
+    private _symbol: PIXI.Text;
+    private _symbolMetrics: PIXI.TextMetrics;
     private _isActivated: boolean;
 
     constructor(settings: IButtonSettings) {
         super(settings);
+
+        // Combine default settings and supplied settings.
+        this.settings = Object.assign({}, { fontSize: 24 }, settings);
 
         this.sprite.sortableChildren = true;
 
@@ -35,13 +40,15 @@ export class Button extends InputComponent {
         this.sprite.buttonMode = true;
         this._graphics = new PIXI.Graphics();
 
-        this._init(settings);
+        this._init(this.settings as IButtonSettings);
         this.handleEvents();
 
-        this.sprite.position.set(settings.x, settings.y);
+        this.sprite.position.set(this.settings.x, this.settings.y);
     }
 
     public setText(text: string) {
+        // todo: add support for symbol.
+        // todo: update metrics for symbol/text.
         this._text.text = text;
     }
 
@@ -52,9 +59,9 @@ export class Button extends InputComponent {
     protected handleEvents() {
         const s: IButtonSettings = this.getSettings<IButtonSettings>();
 
-        this.sprite.on('mousedown', () => {
-            if (this.handlers.has(InputEvents.MouseDown)) {
-                this.handlers.get(InputEvents.MouseDown)();
+        this.sprite.on('pointerdown', () => {
+            if (this.handlers.has(InputEvents.PointerDown)) {
+                this.handlers.get(InputEvents.PointerDown)();
             }
 
             if (s.backgroundActiveColor) {
@@ -67,9 +74,9 @@ export class Button extends InputComponent {
             this._isActivated = true;
         });
 
-        this.sprite.on('mouseup', () => {
-            if (this.handlers.has(InputEvents.MouseUp)) {
-                this.handlers.get(InputEvents.MouseUp)();
+        this.sprite.on('pointerup', () => {
+            if (this.handlers.has(InputEvents.PointerUp)) {
+                this.handlers.get(InputEvents.PointerUp)();
             }
 
             if (s.backgroundActiveColor) {
@@ -82,7 +89,7 @@ export class Button extends InputComponent {
             this._isActivated = false;
         })
 
-        this.sprite.on('mouseover', () => {
+        this.sprite.on('pointerover', () => {
             if (s.backgroundHoverColor) {
                 this._drawRect(s.backgroundHoverColor);
             }
@@ -95,7 +102,7 @@ export class Button extends InputComponent {
             }
         });
 
-        this.sprite.on('mouseout', () => {
+        this.sprite.on('pointerout', () => {
             if (s.backgroundHoverColor) {
                 this._drawRect(s.backgroundColor);
             }
@@ -116,6 +123,12 @@ export class Button extends InputComponent {
         }
 
         this._drawBackground(s);
+
+        if (s.symbol) {
+            this._calculateSymbolMetrics(s);
+        }
+        this._calculateTextMetrics(s);
+
         this._drawText(s.textColor);
         //this._drawDropShadow(s);
 
@@ -161,12 +174,49 @@ export class Button extends InputComponent {
             return;
         }
 
-        this._text = new PIXI.Text(s.text, { fontSize: 12, fill: color });
-        this._text.anchor.set(0.5, 0.5);
-        this._text.x = (s.width) / 2;
-        this._text.y = (s.height) / 2;
+        let totalWidth: number = this._textMetrics.width;
+        let centerX: number = s.width / 2;
+        let centerY: number = s.height / 2;
 
-        this.sprite.addChild(this._text);
+        if (s.symbol) {
+            totalWidth += this._symbolMetrics.width;
+
+            if (!this._symbol) {
+                this._symbol = new PIXI.Text(s.symbol, { fontFamily: 'FontAwesome', fontSize: s.fontSize, fill: color });
+                this._symbol.anchor.set(0.5, 0.5);
+                this.sprite.addChild(this._symbol);
+            }
+
+            this._symbol.position.set(centerX - (this._textMetrics.width / 2), centerY);
+        }
+
+        if (!this._text) {
+            this._text = new PIXI.Text(s.text, { fontFamily: 'chunkfive_printregular', fontSize: s.fontSize, fill: color });
+            this._text.anchor.set(0.5, 0.5);
+            this.sprite.addChild(this._text);
+        }
+        else {
+            this._text.text = s.text;
+        }
+
+        if (s.symbol) {
+            this._text.x = centerX + (this._symbolMetrics.width / 2) + 6;
+            this._text.y = centerY;
+        }
+        else {
+            this._text.x = centerX;
+            this._text.y = centerY;
+        }
+    }
+
+    private _calculateTextMetrics(s: IButtonSettings) {
+        const style: PIXI.TextStyle = new PIXI.TextStyle({ fontFamily: 'chunkfive_printregular', fontSize: s.fontSize });
+        this._textMetrics = PIXI.TextMetrics.measureText(s.text, style);
+    }
+
+    private _calculateSymbolMetrics(s: IButtonSettings) {
+        const style: PIXI.TextStyle = new PIXI.TextStyle({ fontFamily: 'FontAwesome', fontSize: s.fontSize });
+        this._symbolMetrics = PIXI.TextMetrics.measureText(s.symbol, style);
     }
 
     private _drawDropShadow(s: IButtonSettings) {

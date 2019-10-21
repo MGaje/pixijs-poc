@@ -7,6 +7,7 @@
  */
 
 import * as PIXI from 'pixi.js';
+import * as FontFaceObserver from 'fontfaceobserver';
 import {ElementRef} from '@angular/core';
 
 import {SceneManager, ISceneManager} from './scene-manager';
@@ -122,9 +123,13 @@ export abstract class FPGame implements IGame {
                 this._updateProgressbar(loader.progress / 100);
             })
             .load(() => {
-                this._destroyProgressbar();
-                this.setupScenes();
-                this.app.ticker.add(delta => this._update(delta, this.app.ticker));
+                this.loadFonts().then(() => {
+                    this._destroyProgressbar();
+                    this.setupScenes();
+                    this.app.ticker.add(delta => this._update(delta, this.app.ticker));
+                }, () => {
+                    console.error("Couldn't load fonts");
+                });
             });
     }
 
@@ -226,18 +231,19 @@ export abstract class FPGame implements IGame {
         }
     }
 
+    /**
+     * Reset the stage to a scene.
+     * @param s The scene to reset to.
+     */
     private _resetStage(s: Scene) {
         this.app.stage.removeChildren();
         this.app.stage.addChild(this._fpsDisplay); // Better way to do this?
         this.app.stage.addChild(s);
     }
 
-    private _redraw() {
-        if (!this.app || !this.app.renderer) {
-            return;
-        }
-    }
-
+    /**
+     * Setup the loading progress bar.
+     */
     private _setupProgressbar() {
         this._progress = new PIXI.Graphics();
         this._progress.beginFill(0xE1B022);
@@ -253,6 +259,10 @@ export abstract class FPGame implements IGame {
         this.app.stage.addChild(this._progress);
     }
 
+    /**
+     * Update the progress bar with the given percentage.
+     * @param percentage Percentage of assets loaded.
+     */
     private _updateProgressbar(percentage: number) {
         const holeX: number = 250 * percentage;
         const holeWidth: number = (250 - holeX) - 1;
@@ -269,9 +279,28 @@ export abstract class FPGame implements IGame {
         this._progress.position.y = ((this.app.view.height / window.devicePixelRatio) / 2) - (this._progress.height / 2);
     }
 
+    /**
+     * Destroy the progress bar.
+     */
     private _destroyProgressbar() {
         this._progress.clear();
         this._progress.destroy();
         this._progress = null;
+    }
+
+    /**
+     * Load custom fonts.
+     */
+    private loadFonts(): Promise<boolean> {
+        return new Promise<boolean>((resolve, reject) => {
+            const chunkFont = new FontFaceObserver('chunkfive_printregular');
+            const fontAwesome = new FontFaceObserver('FontAwesome');
+
+            Promise.all([
+                chunkFont.load(),
+                fontAwesome.load()
+            ])
+            .then(() => resolve(true), () => reject(false));
+        });
     }
 }

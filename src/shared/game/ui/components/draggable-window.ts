@@ -5,6 +5,9 @@ export interface IDraggableWindowSettings extends IWindowBaseSettings {
     title: string;
 }
 
+/**
+ * This is not a fleshed out component. Don't use it. It was just a PoC.
+ */
 export class DraggableWindow extends WindowBase {
     private _titleBarContext: PIXI.Graphics;
     private _data: PIXI.interaction.InteractionData;

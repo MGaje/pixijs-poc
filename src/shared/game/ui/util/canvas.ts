@@ -1,5 +1,9 @@
 import * as PIXI from 'pixi.js';
 
+/**
+ * Canvas utility class.
+ * Used when we need an auxilary canvas to pull off some more complicated features.
+ */
 export class CanvasUtil {
 
     public static gradient(fromColor: string, toColor: string, w: number = 100, h: number = 100): PIXI.Texture {

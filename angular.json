@@ -32,8 +32,6 @@
             ],
             "scripts": [
                 "node_modules/pixi.js/dist/pixi.min.js",
-                "node_modules/pixi-sound/dist/pixi-sound.js",
-                "node_modules/pixi-ui/bin/pixi-ui.min.js",
                 "node_modules/@tweenjs/tween.js/dist/tween.umd.js"
             ]
           },

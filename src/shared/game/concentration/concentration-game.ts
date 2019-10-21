@@ -33,26 +33,15 @@ export class ConcentrationGame extends FPGame {
     protected load() {
         this.setAssets([
             'assets/card-back.png',
-            'assets/whistle.mp3',
-            'assets/loops/loop1.mp3',
-            'assets/loops/loop2.mp3',
-            'assets/loops/loop3.mp3',
-            'assets/loops/loop4.mp3',
             'assets/applause.mp3',
-            'assets/applause.ogg',
-            'assets/bird.mp3',
-            'assets/boing.mp3',
-            'assets/buzzer.mp3',
-            'assets/car.mp3',
-            'assets/chime.mp3',
-            'assets/mechanical.mp3',
-            'assets/musical.mp3',
-            'assets/sprite.mp3',
-            'assets/success.mp3',
-            'assets/sword.mp3',
-            "assets/burst.png",
+            'assets/burst.png',
             ...ConcentrationGame.cardAssets()
         ]);
+
+        console.log('ogg = ' + document.createElement("audio").canPlayType('audio/ogg'))
+        console.log('mp3 = ' + document.createElement("audio").canPlayType('audio/mp3'))
+        console.log('ac3 = ' + document.createElement("audio").canPlayType('audio/ac3'))
+        console.log('m4a = ' + document.createElement("audio").canPlayType('audio/m4a'))
 
         Keyboard.init();
     }

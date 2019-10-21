@@ -87,6 +87,10 @@ export abstract class Scene extends PIXI.Container {
         return this.resources[file.indexOf('assets') === -1 ? `assets/${file}` : file];
     }
 
+    protected getResourcePath(file: string): string {
+        return `assets/${file}`;
+    }
+
     /**
      * Pause the scene.
      */

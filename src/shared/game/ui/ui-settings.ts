@@ -1,3 +1,6 @@
+/**
+ * Interface for base ui component settings.
+ */
 export interface IUISettings {
     id: string;
     width?: number;

@@ -1,18 +1,18 @@
 import * as PIXI from 'pixi.js';
 import {ElementRef} from '@angular/core';
-import 'pixi-sound';
+import sound from 'pixi-sound';
 import * as TWEEN from '@tweenjs/tween.js';
 import {Scene} from '../../../scene';
 import {Keyboard, Keys} from '../../../keyboard';
 import {InputController} from '../../../input-controller';
 import {ConcentrationGame} from '../../concentration-game';
 import {GameController} from '../../../game-controller';
-import { UIController } from '../../../ui-controller';
 import { Button } from '../../../ui/components/button';
 import { CanvasUtil } from '../../../ui/util/canvas';
 import { DraggableWindow } from '../../../ui/components/draggable-window';
 import { ConfirmDialogWindow } from 'src/shared/game/ui/components/confirm-dialog-window';
 import { IStageMetrics } from 'src/shared/game/stage-metrics';
+import { FontAwesomeSymbols } from 'src/shared/game/ui/util/font-awesome';
 
 const cardWidth = 75;
 const numCols = 16;
@@ -20,7 +20,8 @@ const numCols = 16;
 enum SceneResources {
     CardBackImage = 'card-back.png',
     WhistleSound = 'whistle.mp3',
-    BurstImage = 'burst.png'
+    BurstImage = 'burst.png',
+    ApplauseSound = 'applause.mp3'
 }
 
 class Card {
@@ -101,8 +102,6 @@ export class ConcentrationGamePlayScene extends Scene {
         const stageMetrics: IStageMetrics = GameController.getStageMetrics();
 
         this.cover = new PIXI.Graphics();
-
-        this.cover = new PIXI.Graphics();
         this.cover.beginFill(0x000000);
         this.cover.drawRect(0, 0, stageMetrics.width, stageMetrics.height);
         this.cover.endFill();
@@ -117,7 +116,8 @@ export class ConcentrationGamePlayScene extends Scene {
 
         this.btn = new Button({
             id: "button",
-            text: "New Button",
+            text: "Button Test",
+            symbol: FontAwesomeSymbols.Times,
             textColor: 0xffffff,
             backgroundColor: 0x0000ff,
             backgroundHoverColor: 0x000064,
@@ -129,7 +129,7 @@ export class ConcentrationGamePlayScene extends Scene {
             accessibilityTitle: 'Test Accessibility Title From Concentration Game Test Scene'
         });
 
-        this.btn.onMouseUp(() => {
+        this.btn.onPointerUp(() => {
             if (!this.win.isVisible()) {
                 this.win.open();
             }
@@ -173,12 +173,10 @@ export class ConcentrationGamePlayScene extends Scene {
             y: (stageMetrics.height - 250) / 2
         });
 
-        this.win.onCancel(() => {
-            alert('canceled!');
-        });
-
         this.win.onConfirm(() => {
-            alert('confirmed!');
+            sound.play(this.getResourcePath(SceneResources.ApplauseSound), { 'complete': () => {
+                console.log('sound complete!');
+            }});
         });
 
         this.win.onBeforeLoad(() => {
@@ -240,7 +238,7 @@ export class ConcentrationGamePlayScene extends Scene {
             return;
         }
 
-        this.getResource(SceneResources.WhistleSound).sound.play();
+        sound.play(this.getResourcePath(SceneResources.WhistleSound));
 
         const scale = {y: card.sprite.scale.y};
 

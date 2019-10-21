@@ -1,21 +1,35 @@
 import { WindowBase, IWindowBaseSettings } from '../window-base';
 import { Button } from './button';
 import { InputHandler } from '../input-base';
+import { FontAwesomeSymbols } from '../util/font-awesome';
 
+/**
+ * Specific settings for confirm dialog windows.
+ */
 export interface IConfirmDialogWindowSettings extends IWindowBaseSettings {
     message?: string;
     yesOptionText?: string;
     noOptionText?: string;
 }
 
+/**
+ * Specific events for confirm dialog windows.
+ */
 export enum ConfirmDialogWindowEvents {
     OnConfirm = 'onconfirm',
     OnCancel = 'oncancel'
 }
 
+/**
+ * Confirm dialog window.
+ */
 export class ConfirmDialogWindow extends WindowBase {
     private _message: PIXI.Text;
 
+    /**
+     * Constructor.
+     * @param settings Confirm dialog window settings.
+     */
     constructor(settings: IConfirmDialogWindowSettings) {
         super(settings);
 
@@ -25,15 +39,26 @@ export class ConfirmDialogWindow extends WindowBase {
         this.init();
     }
 
+    /**
+     * Handle children events.
+     */
     public handleEvents() {
-        // todo.
+        // Empty.
     }
 
+    /**
+     * Setup the confirmation dialog.
+     * @param s Confirm dialog window settings.
+     */
     private _setupConfirmationDialogWindow(s: IConfirmDialogWindowSettings) {
         this._setupMessage(s);
         this._setupButtons(s);
     }
 
+    /**
+     * Setup the dialog message.
+     * @param s Confirm dialog window settings.
+     */
     private _setupMessage(s: IConfirmDialogWindowSettings) {
         const compZIndex: number = this.getComponentZIndex();
         const msg: string = s.message || 'Are you sure?';
@@ -52,14 +77,26 @@ export class ConfirmDialogWindow extends WindowBase {
         this.addPixiChild(this._message);
     }
 
+    /**
+     * Setup confirmation handler.
+     * @param h Handler to run when confirmation is triggered.
+     */
     public onConfirm(h: InputHandler) {
         this.handlers.set(ConfirmDialogWindowEvents.OnConfirm, h);
     }
 
+    /**
+     * Setup cancel handler.
+     * @param h Handler to run when cancel is triggered.
+     */
     public onCancel(h: InputHandler) {
         this.handlers.set(ConfirmDialogWindowEvents.OnCancel, h);
     }
 
+    /**
+     * Setup dialog buttons.
+     * @param s Confirm dialog window settings.
+     */
     private _setupButtons(s: IConfirmDialogWindowSettings) {
         const compZIndex: number = this.getComponentZIndex();
         const btnWidth: number = (s.width / 2) - 10;
@@ -76,7 +113,7 @@ export class ConfirmDialogWindow extends WindowBase {
             zIndex: compZIndex
         });
 
-        noBtn.onMouseUp(() => {
+        noBtn.onPointerUp(() => {
             if (this.handlers.has(ConfirmDialogWindowEvents.OnCancel)) {
                 this.handlers.get(ConfirmDialogWindowEvents.OnCancel)();
             }
@@ -86,6 +123,7 @@ export class ConfirmDialogWindow extends WindowBase {
 
         const yesBtn: Button = new Button({
             id: 'yesBtn',
+            symbol: FontAwesomeSymbols.IdCard,
             text: s.yesOptionText || 'Ok',
             textColor: 0xffffff,
             width: (s.width / 2) - 5,
@@ -96,7 +134,7 @@ export class ConfirmDialogWindow extends WindowBase {
             zIndex: compZIndex
         });
 
-        yesBtn.onMouseUp(() => {
+        yesBtn.onPointerUp(() => {
             if (this.handlers.has(ConfirmDialogWindowEvents.OnConfirm)) {
                 this.handlers.get(ConfirmDialogWindowEvents.OnConfirm)();
             }
