@@ -42,6 +42,7 @@ export abstract class FPGame implements IGame {
     private _fpsLastUpdate: number = 0;
 
     private _progress: PIXI.Graphics;
+    private _logo: PIXI.Sprite;
 
     private readonly _targetRatio: number;
 
@@ -114,6 +115,7 @@ export abstract class FPGame implements IGame {
             return;
         }
 
+        this._setupLogo();
         this._setupProgressbar();
 
         this.app.loader
@@ -124,7 +126,7 @@ export abstract class FPGame implements IGame {
             })
             .load(() => {
                 this.loadFonts().then(() => {
-                    this._destroyProgressbar();
+                    this._destroyProgressbarAndLogo();
                     this.setupScenes();
                     this.app.ticker.add(delta => this._update(delta, this.app.ticker));
                 }, () => {
@@ -241,6 +243,19 @@ export abstract class FPGame implements IGame {
         this.app.stage.addChild(s);
     }
 
+    private _setupLogo() {
+        const l: PIXI.Loader = new PIXI.Loader();
+        l.add('logo', 'assets/fpl-logo.png').load((loader, resources) => {
+            this._logo = new PIXI.Sprite(resources.logo.texture);
+            this._logo.anchor.set(0.5, 0.5);
+            this._logo.position.set(
+                ((this.app.view.width / window.devicePixelRatio) / 2),
+                ((this.app.view.height / window.devicePixelRatio) / 2 - (this._logo.height / 2))
+            );
+            this.app.stage.addChild(this._logo);
+        });
+    }
+
     /**
      * Setup the loading progress bar.
      */
@@ -253,8 +268,7 @@ export abstract class FPGame implements IGame {
         this._progress.endHole();
         this._progress.endFill();
 
-        this._progress.position.x = ((this.app.view.width / window.devicePixelRatio) / 2) - (this._progress.width / 2);
-        this._progress.position.y = ((this.app.view.height / window.devicePixelRatio) / 2) - (this._progress.height / 2);
+        this._setProgressBarPosition();
 
         this.app.stage.addChild(this._progress);
     }
@@ -275,17 +289,26 @@ export abstract class FPGame implements IGame {
         this._progress.endHole();
         this._progress.endFill();
 
+        this._setProgressBarPosition();
+    }
+
+    /**
+     * Helper function for setting progressbar position.
+     */
+    private _setProgressBarPosition() {
         this._progress.position.x = ((this.app.view.width / window.devicePixelRatio) / 2) - (this._progress.width / 2);
-        this._progress.position.y = ((this.app.view.height / window.devicePixelRatio) / 2) - (this._progress.height / 2);
+        this._progress.position.y = ((this.app.view.height / window.devicePixelRatio) / 2) - (this._progress.height / 2) + 15;
     }
 
     /**
      * Destroy the progress bar.
      */
-    private _destroyProgressbar() {
+    private _destroyProgressbarAndLogo() {
         this._progress.clear();
         this._progress.destroy();
         this._progress = null;
+
+        this.app.stage.removeChild(this._logo);
     }
 
     /**
