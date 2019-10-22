@@ -88,4 +88,12 @@ export abstract class InputComponent extends InputBase implements IUIDrawable {
     protected getSettings<T extends IUISettings>(): T {
         return this.settings as T;
     }
+
+    /**
+     * Update the input component's settings.
+     * @param settings The settings config to update to.
+     */
+    protected updateSettings<T extends IUISettings>(settings: T): void {
+        this.settings = settings;
+    }
 }

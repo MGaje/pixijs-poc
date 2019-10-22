@@ -127,21 +127,21 @@ export class ConcentrationGamePlayScene extends Scene {
             //backgroundColor: 0x0000ff,
             //backgroundHoverColor: 0x000064,
             //backgroundActiveColor: 0x00ff00,
-            width: 200,
-            height: 77,
+            width: 100,
+            height: 38.5,
             x: 100,
             y: 250,
             accessibilityTitle: 'Test Accessibility Title From Concentration Game Test Scene'
         });
 
-        this.btn.onPointerUp(() => {
-            if (!this.win.isVisible()) {
-                this.win.open();
-            }
-            else {
-                this.win.close();
-            }
-        });
+        // this.btn.onPointerUp(() => {
+        //     if (!this.win.isVisible()) {
+        //         this.win.open();
+        //     }
+        //     else {
+        //         this.win.close();
+        //     }
+        // });
 
         this.addChild(this.btn.getPixiSprite());
 
@@ -153,11 +153,20 @@ export class ConcentrationGamePlayScene extends Scene {
             backgroundColor: 0x0000ff,
             //backgroundHoverColor: 0x000064,
             backgroundActiveColor: 0x00ff00,
-            width: 300,
-            height: 154,
-            x: 500,
+            width: 200,
+            height: 77,
+            x: 477,
             y: 250,
             accessibilityTitle: 'Test Accessibility Title From Concentration Game Test Scene'
+        });
+
+        this.btn2.onPointerUp(() => {
+            if (!this.win.isVisible()) {
+                this.win.open();
+            }
+            else {
+                this.win.close();
+            }
         });
 
         this.addChild(this.btn2.getPixiSprite());
